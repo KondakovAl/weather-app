@@ -6,6 +6,7 @@ const GlobalSlyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    
   }  
 
   body {
@@ -13,7 +14,9 @@ const GlobalSlyle = createGlobalStyle`
     font-size: 12px;
     line-height: 14.5px;
     color: ${colors.lightColor};
-    background-color: ${bgColors.bgLightColor};
+    /* background-color: ${bgColors.bgLightColor}; */
+    background: grey;
+    font-weight: 400;
   }
 
 a {

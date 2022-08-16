@@ -9,13 +9,23 @@ import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
 import { ReactComponent as IconPagination } from '../assets/images/icon_pagination.svg';
 import { ReactComponent as IconMenu } from '../assets/images/icon_menu.svg';
 import { ReactComponent as IconDegree } from '../assets/images/icon_degree.svg';
-import { ReactComponent as IconParam1 } from '../assets/images/icon_param_1.svg';
+import { ReactComponent as IconParamWind } from '../assets/images/icon_param_wind.svg';
+import { ReactComponent as IconParamRain } from '../assets/images/icon_param_rain.svg';
+import { ReactComponent as IconParamPressure } from '../assets/images/icon_param_pressure.svg';
+import { ReactComponent as IconParamHumidity } from '../assets/images/icon_param_humidity.svg';
 import ImgWeather from '../assets/images/img_weather.png';
 
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
 
+const CardWrapper = styled.div`
+  max-width: 358px;
+  margin: 0 auto 16px;
+`;
+
 const CardContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   padding: 16px;
   background: ${gradients.main};
   border-radius: 30px;
@@ -99,6 +109,7 @@ const CardTemperature = styled.span`
   font-weight: 600;
   font-size: 72px;
   line-height: 87px;
+  display: flex;
 `;
 
 const CardText = styled.span`
@@ -113,8 +124,8 @@ const ParamsContainer = styled.div`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  place-items: center;
-  gap: 25px;
+  place-items: start;
+  row-gap: 25px;
 `;
 
 const ParamsItem = styled.div`
@@ -122,6 +133,7 @@ const ParamsItem = styled.div`
   grid-template-columns: repeat(2, auto);
   grid-template-rows: repeat(2, 1fr);
   gap: 5px;
+  padding: 0 15px;
 `;
 
 const ParamsItemIcon = styled.div`
@@ -137,10 +149,10 @@ const ParamsItemTextDescription = styled.span`
   grid-area: 2 / 2 / 3 / 3;
 `;
 
-const Card = () => {
+const MainCard = () => {
   return (
-    <CardContainer>
-      <StyledFlex direction='column'>
+    <CardWrapper>
+      <CardContainer>
         <CardHeader>
           <StyledIconWrapper>
             <IconPlus />
@@ -181,36 +193,38 @@ const Card = () => {
         <ParamsContainer>
           <ParamsItem>
             <ParamsItemIcon>
-              <IconParam1 />
+              <IconParamWind />
             </ParamsItemIcon>
             <ParamsItemTextNum>3.7 km/h</ParamsItemTextNum>
             <ParamsItemTextDescription>Wind</ParamsItemTextDescription>
           </ParamsItem>
           <ParamsItem>
             <ParamsItemIcon>
-              <IconParam1 />
+              <IconParamRain />
             </ParamsItemIcon>
-            <ParamsItemTextNum>3.7 km/h</ParamsItemTextNum>
-            <ParamsItemTextDescription>Wind</ParamsItemTextDescription>
+            <ParamsItemTextNum>74%</ParamsItemTextNum>
+            <ParamsItemTextDescription>
+              Chance of rain
+            </ParamsItemTextDescription>
           </ParamsItem>
           <ParamsItem>
             <ParamsItemIcon>
-              <IconParam1 />
+              <IconParamPressure />
             </ParamsItemIcon>
-            <ParamsItemTextNum>3.7 km/h</ParamsItemTextNum>
-            <ParamsItemTextDescription>Wind</ParamsItemTextDescription>
+            <ParamsItemTextNum>83%</ParamsItemTextNum>
+            <ParamsItemTextDescription>Humidity 83%</ParamsItemTextDescription>
           </ParamsItem>
           <ParamsItem>
             <ParamsItemIcon>
-              <IconParam1 />
+              <IconParamHumidity />
             </ParamsItemIcon>
-            <ParamsItemTextNum>3.7 km/h</ParamsItemTextNum>
-            <ParamsItemTextDescription>Wind</ParamsItemTextDescription>
+            <ParamsItemTextNum>1010 mbar</ParamsItemTextNum>
+            <ParamsItemTextDescription>Pressure</ParamsItemTextDescription>
           </ParamsItem>
         </ParamsContainer>
-      </StyledFlex>
-    </CardContainer>
+      </CardContainer>
+    </CardWrapper>
   );
 };
 
-export { Card };
+export { MainCard };
