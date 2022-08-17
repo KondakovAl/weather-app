@@ -5,10 +5,7 @@ import { HourlyCard } from './components/HourlyCard';
 import { WeeklyCard } from './components/WeeklyCard';
 import { Location } from './components/Location';
 import { bgColors } from './styles/variables';
-
-import { getWeatherData } from './api/getWeatherData';
-
-getWeatherData('london');
+import { getLocation } from './api/getLocation';
 
 const AppWrapper = styled.div`
   width: 100vw;

@@ -9,7 +9,7 @@ import { ReactComponent as IconSearch } from '../assets/images/icon_search.svg';
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
 import { FormEvent, useEffect, useState } from 'react';
-import { getWeatherData } from '../api/getWeatherData';
+import { getLocation } from '../api/getLocation';
 
 const StyledLabel = styled.label`
   /*Change to maxWidth!!*/
@@ -39,7 +39,7 @@ const StyledIconWrapper = styled.div`
 `;
 
 const AutoComplite = styled.ul`
-  display: none;
+  /* display: none; */
   position: absolute;
   padding-top: 15px;
   color: black;
@@ -56,15 +56,16 @@ const AutoCompliteItem = styled.li`
 `;
 
 const Search = () => {
-  const [search, setSearch] = useState('Moscow');
-  const [city, setCity] = useState({});
+  const [search, setSearch] = useState<string | undefined>();
+  const [location, setLocation] = useState<any>();
 
   const changeHandler = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
   };
 
   useEffect(() => {
-    setCity(getWeatherData(search));
+    console.log(location);
+    setLocation(getLocation(search!));
   }, [search]);
 
   return (
@@ -78,9 +79,10 @@ const Search = () => {
         onChange={changeHandler}
       />
       <AutoComplite>
-        <AutoCompliteItem>sddsfsdf</AutoCompliteItem>
-        <AutoCompliteItem>sddsfsdf</AutoCompliteItem>
-        <AutoCompliteItem>sddsfsdf</AutoCompliteItem>
+        {/* {location &&
+          location.map((l: any, index: number) => (
+            <AutoCompliteItem key={index}>{l.label}</AutoCompliteItem>
+          ))} */}
       </AutoComplite>
     </StyledLabel>
   );

@@ -8,15 +8,14 @@ export const getWeatherData = async (city:string) => {
           console.log( await res.json());
           console.log(res.ok)
           if (!res.ok) {
-            console.error( `Couldn't fetch.`, res.status)
+            console.error( `Couldn't fetch weather.`, res.status)
             return false;
           }
           return await res.json();    
     } catch (error) {
       if (error instanceof Error) {
-        console.error( `Couldn't fetch.`, error.message)
+        console.error( `Couldn't fetch weather.`, error.message)
       }
         return false;
     }
-  
   };
