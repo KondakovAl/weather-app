@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 /*Import Variables*/
 import { gradients } from '../styles/variables';
@@ -52,9 +53,11 @@ const Location = () => {
     <Wrapper>
       <Container>
         <CardHeader>
-          <StyledIconWrapper>
-            <IconArrow />
-          </StyledIconWrapper>
+          <Link to='/card'>
+            <StyledIconWrapper>
+              <IconArrow />
+            </StyledIconWrapper>
+          </Link>
           <CardTitle>Manage Location</CardTitle>
         </CardHeader>
         <Search />
