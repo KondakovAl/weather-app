@@ -8,8 +8,10 @@ export const colors = {
 
 export const bgColors = {
     bgLightColor: '#FFFFFF',
+    bgGreyColor: '#878787',
     bgMain: '#2C79C1',
     bgInput: '#F2F2F2'
+    
 }
 
 export const gradients = {

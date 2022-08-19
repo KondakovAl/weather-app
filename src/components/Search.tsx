@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 /*Import Variables*/
 import { bgColors, colors } from '../styles/variables';
@@ -7,13 +8,11 @@ import { bgColors, colors } from '../styles/variables';
 import { ReactComponent as IconSearch } from '../assets/images/icon_search.svg';
 
 /*Import Styles*/
-import { StyledFlex } from '../styles/StyledFlex';
+
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { getLocation } from '../api/getLocation';
 import { useDebounce } from '../hooks/useDebounce';
 import { Loader } from '../styles/Loader';
-import { setConstantValue } from 'typescript';
-import { getWeatherData } from '../api/getWeatherData';
 
 const StyledLabel = styled.label`
   /*Change to maxWidth!!*/
@@ -53,24 +52,27 @@ const AutoComplite = styled.ul`
   background: ${bgColors.bgInput};
   z-index: -1;
   border-radius: 0 0 16px 16px;
+  overflow: hidden;
 `;
 
 const AutoCompliteItem = styled.li`
   padding: 15px;
+  transition: background 0.3s ease-in;
+  &:hover {
+    background: ${bgColors.bgGreyColor};
+  }
 `;
 
-const AutoCompliteLoader = styled.li`
-  padding: 15px;
-`;
+interface SearchProps {
+  setCurrentLocation: (currentLocation: string) => void;
+}
 
-const Search = () => {
+const Search = ({ setCurrentLocation }: SearchProps) => {
   const [search, setSearch] = useState<string | undefined | null>();
   const [location, setLocation] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>();
-  const [currentLocation, setCurrentLocation] = useState<any | undefined>();
 
-  const ref = useRef<any>();
-  const debouncedSearch = useDebounce(search, 1000);
+  const debouncedSearch = useDebounce(search, 600);
 
   const handleChange = (e: FormEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
@@ -81,19 +83,15 @@ const Search = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    getLocation(debouncedSearch).then((res) => {
-      setLoading(false);
-      setLocation(res);
-    });
+    if (debouncedSearch) {
+      setLoading(true);
+      getLocation(debouncedSearch).then((res) => {
+        setLoading(false);
+        setLocation(res);
+      });
+    }
     console.log(loading);
   }, [debouncedSearch]);
-
-  useEffect(() => {
-    console.log(currentLocation);
-  }, [currentLocation]);
-
-  getWeatherData(24.451111111, 54.396944444);
 
   return (
     <StyledLabel>
@@ -111,16 +109,18 @@ const Search = () => {
         ) : (
           location &&
           location.map((l: any, index: number) => (
-            <AutoCompliteItem
-              key={index}
-              onClick={() => {
-                setCurrentLocation(l.value);
-                setLocation([]);
-                handleClear();
-              }}
-            >
-              {l.label}
-            </AutoCompliteItem>
+            <Link to='/card'>
+              <AutoCompliteItem
+                key={index}
+                onClick={() => {
+                  setCurrentLocation(l);
+                  setLocation([]);
+                  handleClear();
+                }}
+              >
+                {l.label}
+              </AutoCompliteItem>
+            </Link>
           ))
         )}
       </AutoComplite>

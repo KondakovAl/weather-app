@@ -12,6 +12,7 @@ import { StyledFlex } from '../styles/StyledFlex';
 
 const CardWrapper = styled.div`
   background: ${bgColors.bgMain};
+  width: 100%;
 `;
 
 const CardDate = styled.div`

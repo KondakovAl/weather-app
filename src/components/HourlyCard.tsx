@@ -13,6 +13,7 @@ import { StyledFlex } from '../styles/StyledFlex';
 const CardWrapper = styled.div`
   background: ${bgColors.bgMain};
   margin-bottom: 16px;
+  width: 100%;
 `;
 
 const CardDateContainer = styled.div`

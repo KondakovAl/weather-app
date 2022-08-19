@@ -1,5 +1,5 @@
 import styled, { keyframes } from "styled-components";
-import { bgColors } from "./variables";
+import { bgColors, colors } from "./variables";
 
 const rotate360 = keyframes`
   from {
@@ -13,10 +13,8 @@ const rotate360 = keyframes`
 const Loader = styled.div`
   animation: ${rotate360} 1s linear infinite;
   transform: translateZ(0);
-  border-top: 2px solid grey;
-  border-right: 2px solid grey;
-  border-bottom: 2px solid grey;
-  border-left: 4px solid ${bgColors.bgMain};
+  border: 2px solid ${colors.inputColor};
+  border-left: 3px solid ${colors.darkColor};
   background: transparent;
   width: 24px;
   height: 24px;

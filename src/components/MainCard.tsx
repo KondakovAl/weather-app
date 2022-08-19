@@ -1,8 +1,8 @@
-import styled from 'styled-components';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 /*Import Variables*/
 import { gradients } from '../styles/variables';
-import { colors } from '../styles/variables';
+import { colors, bgColors } from '../styles/variables';
 
 /*Import Images*/
 import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
@@ -17,15 +17,19 @@ import ImgWeather from '../assets/images/img_weather.png';
 
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
+import { Link } from 'react-router-dom';
+import { Loader } from '../styles/Loader';
 
 const CardWrapper = styled.div`
   max-width: 358px;
   margin: 0 auto 16px;
+  width: 100%;
 `;
 
 const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
+  min-height: 370px;
   padding: 16px;
   background: ${gradients.main};
   border-radius: 30px;
@@ -132,14 +136,23 @@ const ParamsItem = styled.div`
   display: grid;
   grid-template-columns: repeat(2, auto);
   grid-template-rows: repeat(2, 1fr);
-  gap: 5px;
+  gap: 5px 10px;
   padding: 0 15px;
 `;
 
 const ParamsItemIcon = styled.div`
+  transition: transform 1s ease-in;
   display: flex;
   align-items: center;
   grid-area: 1 / 1 / 3 / 2;
+`;
+
+interface ParamsItemIconWindProps {
+  rotation: number;
+}
+
+const ParamsItemIconWind = styled(ParamsItemIcon)<ParamsItemIconWindProps>`
+  transform: rotate(${(p) => p.rotation}deg);
 `;
 
 const ParamsItemTextNum = styled.span`
@@ -149,79 +162,108 @@ const ParamsItemTextDescription = styled.span`
   grid-area: 2 / 2 / 3 / 3;
 `;
 
-const MainCard = () => {
+const LoaderCurrent = styled(Loader)`
+  width: 50px;
+  height: 50px;
+  border: 4px solid white;
+  border-left: 6px solid ${bgColors.bgMain};
+  margin: auto;
+`;
+
+interface MainCardProps {
+  dataCurrent: any;
+  loading: boolean;
+}
+
+const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
   return (
     <CardWrapper>
       <CardContainer>
-        <CardHeader>
-          <StyledIconWrapper>
-            <IconPlus />
-          </StyledIconWrapper>
-          <StyledFlex direction='column' align='center'>
-            <CardTitle>Malang</CardTitle>
-            <PaginationList>
-              <PaginationListItem active>
-                <IconPagination />
-              </PaginationListItem>
-              <PaginationListItem>
-                <IconPagination />
-              </PaginationListItem>
-              <PaginationListItem>
-                <IconPagination />
-              </PaginationListItem>
-            </PaginationList>
-          </StyledFlex>
-          <StyledIconWrapper>
-            <IconMenu />
-          </StyledIconWrapper>
-        </CardHeader>
-        <CardMain>
-          <CardMainImgContainer>
-            <CardMainImg />
-          </CardMainImgContainer>
-          <CardMainInfoContainer>
-            <CardDateContainer>
-              <CardDate>Sunday</CardDate>|<CardDate>Nov 14</CardDate>
-            </CardDateContainer>
-            <CardTemperature>
-              24
-              <IconDegree />
-            </CardTemperature>
-            <CardText>Heavy rain</CardText>
-          </CardMainInfoContainer>
-        </CardMain>
-        <ParamsContainer>
-          <ParamsItem>
-            <ParamsItemIcon>
-              <IconParamWind />
-            </ParamsItemIcon>
-            <ParamsItemTextNum>3.7 km/h</ParamsItemTextNum>
-            <ParamsItemTextDescription>Wind</ParamsItemTextDescription>
-          </ParamsItem>
-          <ParamsItem>
-            <ParamsItemIcon>
-              <IconParamRain />
-            </ParamsItemIcon>
-            <ParamsItemTextNum>74%</ParamsItemTextNum>
-            <ParamsItemTextDescription>
-              Chance of rain
-            </ParamsItemTextDescription>
-          </ParamsItem>
-          <ParamsItem>
-            <ParamsItemIcon>
-              <IconParamPressure />
-            </ParamsItemIcon>
-            <ParamsItemTextNum>83%</ParamsItemTextNum>
-            <ParamsItemTextDescription>Humidity 83%</ParamsItemTextDescription>
-          </ParamsItem>
-          <ParamsItem>
-            <ParamsItemIcon>
-              <IconParamHumidity />
-            </ParamsItemIcon>
-            <ParamsItemTextNum>1010 mbar</ParamsItemTextNum>
-            <ParamsItemTextDescription>Pressure</ParamsItemTextDescription>
-          </ParamsItem>
-        </ParamsContainer>
+        {loading ? (
+          <LoaderCurrent />
+        ) : (
+          <>
+            <CardHeader>
+              <StyledIconWrapper>
+                <IconPlus />
+              </StyledIconWrapper>
+              <StyledFlex direction='column' align='center'>
+                <CardTitle>{dataCurrent?.name}</CardTitle>
+                <PaginationList>
+                  <PaginationListItem active>
+                    <IconPagination />
+                  </PaginationListItem>
+                  <PaginationListItem>
+                    <IconPagination />
+                  </PaginationListItem>
+                  <PaginationListItem>
+                    <IconPagination />
+                  </PaginationListItem>
+                </PaginationList>
+              </StyledFlex>
+              <Link to='/'>
+                <StyledIconWrapper>
+                  <IconMenu />
+                </StyledIconWrapper>
+              </Link>
+            </CardHeader>
+            <CardMain>
+              <CardMainImgContainer>
+                <CardMainImg />
+              </CardMainImgContainer>
+              <CardMainInfoContainer>
+                <CardDateContainer>
+                  <CardDate>Sunday</CardDate>|<CardDate>Nov 14</CardDate>
+                </CardDateContainer>
+                <CardTemperature>
+                  {dataCurrent?.main.temp}
+                  <IconDegree />
+                </CardTemperature>
+                <CardText>{dataCurrent?.weather[0].description}</CardText>
+              </CardMainInfoContainer>
+            </CardMain>
+            <ParamsContainer>
+              <ParamsItem>
+                <ParamsItemIconWind rotation={dataCurrent?.wind.deg}>
+                  <IconParamWind />
+                </ParamsItemIconWind>
+                <ParamsItemTextNum>
+                  {dataCurrent?.wind.speed} km/h
+                </ParamsItemTextNum>
+                <ParamsItemTextDescription>Wind</ParamsItemTextDescription>
+              </ParamsItem>
+              <ParamsItem>
+                <ParamsItemIcon>
+                  <IconParamRain />
+                </ParamsItemIcon>
+                <ParamsItemTextNum>74%</ParamsItemTextNum>
+                <ParamsItemTextDescription>
+                  Chance of rain
+                </ParamsItemTextDescription>
+              </ParamsItem>
+              <ParamsItem>
+                <ParamsItemIcon>
+                  <IconParamPressure />
+                </ParamsItemIcon>
+                <ParamsItemTextNum>
+                  {dataCurrent?.main.humidity}%
+                </ParamsItemTextNum>
+                <ParamsItemTextDescription>
+                  Humidity {dataCurrent?.main.humidity}%
+                </ParamsItemTextDescription>
+              </ParamsItem>
+              <ParamsItem>
+                <ParamsItemIcon>
+                  <IconParamHumidity />
+                </ParamsItemIcon>
+                <ParamsItemTextNum>
+                  {dataCurrent?.main.pressure} mbar
+                </ParamsItemTextNum>
+                <ParamsItemTextDescription>Pressure</ParamsItemTextDescription>
+              </ParamsItem>
+            </ParamsContainer>
+          </>
+        )}
       </CardContainer>
     </CardWrapper>
   );
