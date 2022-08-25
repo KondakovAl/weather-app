@@ -3,7 +3,7 @@ import { Routes, Route, Link } from 'react-router-dom';
 import { MainPage } from './pages/MainPage';
 import { SearchPage } from './pages/SearchPage';
 import { NotFoundPage } from './pages/NotFoundPage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const AppWrapper = styled.div`
   width: 100vw;
@@ -22,13 +22,22 @@ const WeatherApp = styled.div`
 const App = () => {
   const [currentLocation, setCurrentLocation] = useState<string | any>();
 
+  useEffect(() => {
+    console.log(currentLocation);
+  }, [currentLocation]);
+
   return (
     <AppWrapper>
       <WeatherApp>
         <Routes>
           <Route
             path='/'
-            element={<SearchPage setCurrentLocation={setCurrentLocation} />}
+            element={
+              <SearchPage
+                setCurrentLocation={setCurrentLocation}
+                currentLocation={currentLocation}
+              />
+            }
           />
           <Route
             path='/card'

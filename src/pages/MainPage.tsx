@@ -3,9 +3,8 @@ import { useState, useEffect } from 'react';
 import { getCurrentWeather, getDailyWeather } from '../api/getWeatherData';
 import { HourlyCard } from '../components/HourlyCard';
 import { MainCard } from '../components/MainCard';
-import { WeeklyCard } from '../components/WeeklyCard';
+import { DailyCard } from '../components/DailyCard';
 import { bgColors } from '../styles/variables';
-import { Loader } from '../styles/Loader';
 
 const WeatherApp = styled.div`
   display: flex;
@@ -18,24 +17,30 @@ const WeatherApp = styled.div`
 `;
 
 interface MainPageProps {
-  currentLocation: any;
+  currentLocation: {
+    value: string;
+    label: string;
+  };
 }
 
 const MainPage = ({ currentLocation }: MainPageProps) => {
   const [currentWeather, setCurrentWeather] = useState();
   const [dailyWeather, setDailyWeather] = useState();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingCurrent, setLoadingCurrrent] = useState<boolean>(true);
+  const [loadingDaily, setLoadingDaily] = useState<boolean>(true);
 
   useEffect(() => {
     if (currentLocation) {
       const [lat, lon] = currentLocation.value.split(' ');
-      setLoading(true);
       getCurrentWeather(lat, lon).then((res) => {
         setCurrentWeather({ city: currentLocation.label, ...res });
-        setLoading(false);
+        setLoadingCurrrent(false);
+      });
+      getDailyWeather(lat, lon).then((res) => {
+        setDailyWeather(res);
+        setLoadingDaily(false);
       });
     }
-
     console.log(currentLocation);
   }, [currentLocation]);
 
@@ -43,11 +48,15 @@ const MainPage = ({ currentLocation }: MainPageProps) => {
     console.log(currentWeather);
   }, [currentWeather]);
 
+  useEffect(() => {
+    console.log(dailyWeather);
+  }, [dailyWeather]);
+
   return (
     <WeatherApp>
-      <MainCard dataCurrent={currentWeather} loading={loading} />
+      <MainCard dataCurrent={currentWeather} loading={loadingCurrent} />
       <HourlyCard />
-      <WeeklyCard />
+      <DailyCard dataDaily={dailyWeather} loading={loadingDaily} />
     </WeatherApp>
   );
 };

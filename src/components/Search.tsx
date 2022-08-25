@@ -109,9 +109,8 @@ const Search = ({ setCurrentLocation }: SearchProps) => {
         ) : (
           location &&
           location.map((l: any, index: number) => (
-            <Link to='/card'>
+            <Link to='/card' key={index}>
               <AutoCompliteItem
-                key={index}
                 onClick={() => {
                   setCurrentLocation(l);
                   setLocation([]);

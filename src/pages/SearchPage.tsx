@@ -10,6 +10,7 @@ import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
 /*Import Components*/
 import { LocationCards } from '../components/LocationCards';
 import { Search } from '../components/Search';
+import { useEffect, useState } from 'react';
 
 const WeatherApp = styled.div`
   height: 100%;
@@ -32,6 +33,7 @@ const CardHeader = styled.header`
   align-items: center;
   width: 100%;
   margin-bottom: 32px;
+  min-height: 32px;
 `;
 
 const CardTitle = styled.h2`
@@ -41,22 +43,33 @@ const CardTitle = styled.h2`
   margin: 0 auto;
 `;
 
-const StyledIconWrapper = styled.div`
-  display: flex;
+interface StyledIconWrapperProps {
+  currentLocation: any;
+}
+
+const StyledIconWrapper = styled.div<StyledIconWrapperProps>`
+  display: ${(p) => (p.currentLocation ? 'flex' : 'none')};
   cursor: pointer;
 `;
 
 interface SearchPageProps {
+  currentLocation: {
+    value: string;
+    label: string;
+  };
   setCurrentLocation: (currentLocation: string) => void;
 }
 
-const SearchPage = ({ setCurrentLocation }: SearchPageProps) => {
+const SearchPage = ({
+  currentLocation,
+  setCurrentLocation,
+}: SearchPageProps) => {
   return (
     <WeatherApp>
       <Container>
         <CardHeader>
           <Link to='/card'>
-            <StyledIconWrapper>
+            <StyledIconWrapper currentLocation={currentLocation}>
               <IconArrow />
             </StyledIconWrapper>
           </Link>

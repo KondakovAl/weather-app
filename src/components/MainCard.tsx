@@ -10,15 +10,16 @@ import { ReactComponent as IconPagination } from '../assets/images/icon_paginati
 import { ReactComponent as IconMenu } from '../assets/images/icon_menu.svg';
 import { ReactComponent as IconDegree } from '../assets/images/icon_degree.svg';
 import { ReactComponent as IconParamWind } from '../assets/images/icon_param_wind.svg';
-import { ReactComponent as IconParamRain } from '../assets/images/icon_param_rain.svg';
+import { ReactComponent as IconParamCloudness } from '../assets/images/icon_param_cloudness.svg';
 import { ReactComponent as IconParamPressure } from '../assets/images/icon_param_pressure.svg';
 import { ReactComponent as IconParamHumidity } from '../assets/images/icon_param_humidity.svg';
-import ImgWeather from '../assets/images/img_weather.png';
 
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
 import { Link } from 'react-router-dom';
 import { Loader } from '../styles/Loader';
+import { getFormatedDate } from '../helpers/getFormatedDate';
+import { useState, useEffect } from 'react';
 
 const CardWrapper = styled.div`
   max-width: 358px;
@@ -29,7 +30,7 @@ const CardWrapper = styled.div`
 const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 370px;
+  min-height: 353px;
   padding: 16px;
   background: ${gradients.main};
   border-radius: 30px;
@@ -84,10 +85,9 @@ const CardMainImgContainer = styled.div`
   display: flex;
 `;
 
-const CardMainImg = styled.img.attrs({
-  src: ImgWeather,
-})`
+const CardMainImg = styled.img`
   display: block;
+  width: 130px;
 `;
 
 const CardMainInfoContainer = styled.div`
@@ -176,6 +176,15 @@ interface MainCardProps {
 }
 
 const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
+  const [formatedDate, setFormatedDate] = useState<any>();
+
+  useEffect(() => {
+    if (dataCurrent && dataCurrent.dt) {
+      setFormatedDate(getFormatedDate(dataCurrent.dt));
+    }
+    console.log(formatedDate);
+  }, [dataCurrent]);
+
   return (
     <CardWrapper>
       <CardContainer>
@@ -209,14 +218,18 @@ const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
             </CardHeader>
             <CardMain>
               <CardMainImgContainer>
-                <CardMainImg />
+                <CardMainImg
+                  alt={dataCurrent?.weather[0].description}
+                  src={require(`../assets/images/weatherCurrentIcons/${dataCurrent?.weather[0].icon}.png`)}
+                />
               </CardMainImgContainer>
               <CardMainInfoContainer>
                 <CardDateContainer>
-                  <CardDate>Sunday</CardDate>|<CardDate>Nov 14</CardDate>
+                  <CardDate>{formatedDate?.weekday}</CardDate>|
+                  <CardDate>{formatedDate?.monthAndDay}</CardDate>
                 </CardDateContainer>
                 <CardTemperature>
-                  {dataCurrent?.main.temp}
+                  {Math.round(dataCurrent?.main.temp)}
                   <IconDegree />
                 </CardTemperature>
                 <CardText>{dataCurrent?.weather[0].description}</CardText>
@@ -234,12 +247,12 @@ const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
               </ParamsItem>
               <ParamsItem>
                 <ParamsItemIcon>
-                  <IconParamRain />
+                  <IconParamCloudness />
                 </ParamsItemIcon>
-                <ParamsItemTextNum>74%</ParamsItemTextNum>
-                <ParamsItemTextDescription>
-                  Chance of rain
-                </ParamsItemTextDescription>
+                <ParamsItemTextNum>
+                  {dataCurrent?.clouds.all}%
+                </ParamsItemTextNum>
+                <ParamsItemTextDescription>Cloudness</ParamsItemTextDescription>
               </ParamsItem>
               <ParamsItem>
                 <ParamsItemIcon>
@@ -248,9 +261,7 @@ const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
                 <ParamsItemTextNum>
                   {dataCurrent?.main.humidity}%
                 </ParamsItemTextNum>
-                <ParamsItemTextDescription>
-                  Humidity {dataCurrent?.main.humidity}%
-                </ParamsItemTextDescription>
+                <ParamsItemTextDescription>Humidity</ParamsItemTextDescription>
               </ParamsItem>
               <ParamsItem>
                 <ParamsItemIcon>

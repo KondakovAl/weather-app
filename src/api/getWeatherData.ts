@@ -19,7 +19,7 @@ export const getDailyWeather = async (lat: string, lon: string) => {
   try {
       const res = await fetch(
         `${BASE_URL}forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
-        console.log( await res.json());   
+        
         return await res.json();    
   } catch (error) {
     if (error instanceof Error) {
