@@ -9,9 +9,12 @@ import { ReactComponent as IconHourly1 } from '../assets/images/icon_hourly_1.sv
 
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
+import { getDate, getFormatedHours } from '../helpers/getFormatedDate';
+import { useEffect, useState } from 'react';
 
 const CardWrapper = styled.div`
-  background: ${bgColors.bgMain};
+  background: ${(props) => props.theme.background};
+  color: ${(props) => props.theme.color};
   margin-bottom: 16px;
   width: 100%;
 `;
@@ -29,6 +32,10 @@ const CardDate = styled.span`
   font-size: inherit;
 `;
 
+const CardIcon = styled.img`
+  width: 30px;
+`;
+
 const CardInfoContainer = styled.div`
   display: flex;
   width: -webkit-fill-available;
@@ -37,20 +44,16 @@ const CardInfoContainer = styled.div`
   &::-webkit-scrollbar {
     background: #fff;
     height: 7px;
-    background-color: ${bgColors.bgMain};
+    background-color: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: ${bgColors.bgMain};
+    background-color: transparent;
     height: 7px;
     border-radius: 5px;
   }
   &:hover::-webkit-scrollbar-thumb {
     background: #223c50;
   }
-`;
-
-const CardMiniContainer = styled.div`
-  display: flex;
 `;
 
 const CardMini = styled.div`
@@ -82,86 +85,51 @@ const CardTemp = styled.span``;
 
 const CardRain = styled.div``;
 
-const HourlyCard = () => {
+interface HourlyCardProps {
+  dataHourly: any;
+  loading: boolean;
+  date: {
+    hour: number;
+    time: string;
+    weekday: string;
+    monthAndDay: string;
+  };
+}
+
+const HourlyCard = ({ dataHourly, loading, date }: HourlyCardProps) => {
+  const [hours, setHours] = useState<any>();
+
+  useEffect(() => {
+    setHours(
+      getFormatedHours(dataHourly?.list[0].dt, dataHourly?.city.timezone)
+    );
+    console.log(hours);
+  }, [hours]);
+
   return (
     <CardWrapper>
       <StyledFlex direction='column'>
         <CardDateContainer>
-          <CardDate>Sunday</CardDate>|<CardDate>Nov 14</CardDate>
+          <CardDate>{date?.weekday}</CardDate>|
+          <CardDate>{date?.monthAndDay}</CardDate>
         </CardDateContainer>
         <CardInfoContainer>
-          <CardMiniContainer>
-            <CardMini>
-              <CardTime>Now</CardTime>
-              <CardIconContainer>
-                <IconHourly1 />
-              </CardIconContainer>
-              <CardTempContainer>
-                <CardTemp>20°</CardTemp>/<CardTemp>24°</CardTemp>
-              </CardTempContainer>
-              <CardRain>74% rain</CardRain>
-            </CardMini>
-            <CardMini>
-              <CardTime>Now</CardTime>
-              <CardIconContainer>
-                <IconHourly1 />
-              </CardIconContainer>
-              <CardTempContainer>
-                <CardTemp>20°</CardTemp>/<CardTemp>24°</CardTemp>
-              </CardTempContainer>
-              <CardRain>74% rain</CardRain>
-            </CardMini>
-            <CardMini>
-              <CardTime>Now</CardTime>
-              <CardIconContainer>
-                <IconHourly1 />
-              </CardIconContainer>
-              <CardTempContainer>
-                <CardTemp>20°</CardTemp>/<CardTemp>24°</CardTemp>
-              </CardTempContainer>
-              <CardRain>74% rain</CardRain>
-            </CardMini>
-            <CardMini>
-              <CardTime>Now</CardTime>
-              <CardIconContainer>
-                <IconHourly1 />
-              </CardIconContainer>
-              <CardTempContainer>
-                <CardTemp>20°</CardTemp>/<CardTemp>24°</CardTemp>
-              </CardTempContainer>
-              <CardRain>74% rain</CardRain>
-            </CardMini>
-            <CardMini>
-              <CardTime>Now</CardTime>
-              <CardIconContainer>
-                <IconHourly1 />
-              </CardIconContainer>
-              <CardTempContainer>
-                <CardTemp>20°</CardTemp>/<CardTemp>24°</CardTemp>
-              </CardTempContainer>
-              <CardRain>74% rain</CardRain>
-            </CardMini>
-            <CardMini>
-              <CardTime>Now</CardTime>
-              <CardIconContainer>
-                <IconHourly1 />
-              </CardIconContainer>
-              <CardTempContainer>
-                <CardTemp>20°</CardTemp>/<CardTemp>24°</CardTemp>
-              </CardTempContainer>
-              <CardRain>74% rain</CardRain>
-            </CardMini>
-            <CardMini>
-              <CardTime>Now</CardTime>
-              <CardIconContainer>
-                <IconHourly1 />
-              </CardIconContainer>
-              <CardTempContainer>
-                <CardTemp>20°</CardTemp>/<CardTemp>24°</CardTemp>
-              </CardTempContainer>
-              <CardRain>74% rain</CardRain>
-            </CardMini>
-          </CardMiniContainer>
+          {dataHourly &&
+            dataHourly?.list.slice(0, 7).map((item: any, index: number) => (
+              <CardMini key={index}>
+                <CardTime>{item?.dt_txt.substr(-8, 5)}</CardTime>
+                <CardIconContainer>
+                  <CardIcon
+                    alt={item?.weather[0].description}
+                    src={require(`../assets/images/weatherOtherIcons/${item?.weather[0].icon}.svg`)}
+                  />
+                </CardIconContainer>
+                <CardTempContainer>
+                  <CardTemp>{item?.main.temp.toFixed(1)}°</CardTemp>
+                </CardTempContainer>
+                <CardRain>{item?.weather[0].main}</CardRain>
+              </CardMini>
+            ))}
         </CardInfoContainer>
       </StyledFlex>
     </CardWrapper>

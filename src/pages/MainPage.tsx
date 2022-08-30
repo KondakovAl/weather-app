@@ -5,6 +5,7 @@ import { HourlyCard } from '../components/HourlyCard';
 import { MainCard } from '../components/MainCard';
 import { DailyCard } from '../components/DailyCard';
 import { bgColors } from '../styles/variables';
+import { getDate } from '../helpers/getFormatedDate';
 
 const WeatherApp = styled.div`
   display: flex;
@@ -21,11 +22,24 @@ interface MainPageProps {
     value: string;
     label: string;
   };
+  date: any;
+  setDate: (date: any) => void;
+  currentWeather: any;
+  setCurrentWeather: (currentWeather: any) => void;
+  favLocations: any;
+  setFavLocations: (favLocations: any) => void;
 }
 
-const MainPage = ({ currentLocation }: MainPageProps) => {
-  const [currentWeather, setCurrentWeather] = useState();
-  const [dailyWeather, setDailyWeather] = useState();
+const MainPage = ({
+  currentLocation,
+  date,
+  setDate,
+  currentWeather,
+  setCurrentWeather,
+  favLocations,
+  setFavLocations,
+}: MainPageProps) => {
+  const [otherWeather, setOtherWeather] = useState();
   const [loadingCurrent, setLoadingCurrrent] = useState<boolean>(true);
   const [loadingDaily, setLoadingDaily] = useState<boolean>(true);
 
@@ -37,11 +51,10 @@ const MainPage = ({ currentLocation }: MainPageProps) => {
         setLoadingCurrrent(false);
       });
       getDailyWeather(lat, lon).then((res) => {
-        setDailyWeather(res);
+        setOtherWeather(res);
         setLoadingDaily(false);
       });
     }
-    console.log(currentLocation);
   }, [currentLocation]);
 
   useEffect(() => {
@@ -49,14 +62,31 @@ const MainPage = ({ currentLocation }: MainPageProps) => {
   }, [currentWeather]);
 
   useEffect(() => {
-    console.log(dailyWeather);
-  }, [dailyWeather]);
+    console.log(otherWeather);
+  }, [otherWeather]);
+
+  useEffect(() => {
+    if (currentWeather && currentWeather.timezone) {
+      setDate(getDate(currentWeather.timezone));
+    }
+  }, [currentWeather]);
 
   return (
     <WeatherApp>
-      <MainCard dataCurrent={currentWeather} loading={loadingCurrent} />
-      <HourlyCard />
-      <DailyCard dataDaily={dailyWeather} loading={loadingDaily} />
+      <MainCard
+        dataCurrent={currentWeather}
+        loading={loadingCurrent}
+        date={date}
+        favLocations={favLocations}
+        setFavLocations={setFavLocations}
+        currentLocation={currentLocation}
+      />
+      <HourlyCard
+        dataHourly={otherWeather}
+        loading={loadingDaily}
+        date={date}
+      />
+      <DailyCard dataDaily={otherWeather} loading={loadingDaily} />
     </WeatherApp>
   );
 };

@@ -6,19 +6,20 @@ import { colors, bgColors } from '../styles/variables';
 
 /*Import Images*/
 import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
-import { ReactComponent as IconPagination } from '../assets/images/icon_pagination.svg';
-import { ReactComponent as IconMenu } from '../assets/images/icon_menu.svg';
+import { ReactComponent as IconAdd } from '../assets/images/icon_add.svg';
+
 import { ReactComponent as IconDegree } from '../assets/images/icon_degree.svg';
 import { ReactComponent as IconParamWind } from '../assets/images/icon_param_wind.svg';
 import { ReactComponent as IconParamCloudness } from '../assets/images/icon_param_cloudness.svg';
 import { ReactComponent as IconParamPressure } from '../assets/images/icon_param_pressure.svg';
 import { ReactComponent as IconParamHumidity } from '../assets/images/icon_param_humidity.svg';
 
+/*Import Images*/
+import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
 import { Link } from 'react-router-dom';
 import { Loader } from '../styles/Loader';
-import { getFormatedDate } from '../helpers/getFormatedDate';
 import { useState, useEffect } from 'react';
 
 const CardWrapper = styled.div`
@@ -32,7 +33,8 @@ const CardContainer = styled.div`
   flex-direction: column;
   min-height: 353px;
   padding: 16px;
-  background: ${gradients.main};
+  background: ${(props) => props.theme.background};
+  color: ${(props) => props.theme.color};
   border-radius: 30px;
 `;
 
@@ -48,7 +50,7 @@ const CardTitle = styled.h1`
   font-weight: 600;
   font-size: 16px;
   line-height: 20px;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
 `;
 
 const PaginationList = styled.ul`
@@ -70,7 +72,35 @@ const PaginationListItem = styled.li<PaginationListItemProps>`
 
 const StyledIconWrapper = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  width: 32px;
+  height: 32px;
+  & svg {
+    display: block;
+    & path {
+      stroke: ${(props) => props.theme.color};
+    }
+  }
+`;
+
+const StyledIconWrapperDeg = styled.div`
+  display: flex;
+  & circle {
+    stroke: ${(props) => props.theme.color};
+  }
+`;
+
+const StyledIconWrapperArrow = styled.div`
+  transform: rotate(180deg);
+
+  & svg {
+    display: block;
+    & path {
+      fill: ${(props) => props.theme.color};
+    }
+  }
 `;
 
 const CardMain = styled.main`
@@ -94,6 +124,7 @@ const CardMainInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 130px;
 `;
 
 const CardDateContainer = styled.div`
@@ -116,14 +147,15 @@ const CardTemperature = styled.span`
   display: flex;
 `;
 
-const CardText = styled.span`
+const CardText = styled.p`
   font-weight: 400;
   font-size: 16px;
   line-height: 20px;
+  text-align: center;
 `;
 
 const ParamsContainer = styled.div`
-  border-top: 1px solid ${colors.lightColor};
+  border-top: 1px solid ${(props) => props.theme.color};
   padding-top: 16px;
   width: 100%;
   display: grid;
@@ -145,6 +177,15 @@ const ParamsItemIcon = styled.div`
   display: flex;
   align-items: center;
   grid-area: 1 / 1 / 3 / 2;
+  & svg path {
+    fill: ${(props) => props.theme.color};
+  }
+`;
+
+const ParamsItemIconHum = styled(ParamsItemIcon)`
+  & svg path {
+    stroke: ${(props) => props.theme.color};
+  }
 `;
 
 interface ParamsItemIconWindProps {
@@ -171,19 +212,44 @@ const LoaderCurrent = styled(Loader)`
 `;
 
 interface MainCardProps {
+  currentLocation: {
+    value: string;
+    label: string;
+  };
   dataCurrent: any;
   loading: boolean;
+  date: {
+    hour: number;
+    time: string;
+    weekday: string;
+    mounthAndDay: string;
+  };
+  favLocations: any;
+  setFavLocations: (favLocations: any) => void;
 }
 
-const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
-  const [formatedDate, setFormatedDate] = useState<any>();
+const MainCard = ({
+  currentLocation,
+  dataCurrent,
+  loading,
+  date,
+  favLocations,
+  setFavLocations,
+}: MainCardProps) => {
+  /*Add or Remove cards from fovorites*/
+  const onHadleClick = () => {
+    if (!favLocations.includes(currentLocation.value)) {
+      setFavLocations((arr: any) => [...arr, currentLocation.value]);
+    } else {
+      setFavLocations(
+        favLocations.filter((p: any) => p !== currentLocation.value)
+      );
+    }
+  };
 
   useEffect(() => {
-    if (dataCurrent && dataCurrent.dt) {
-      setFormatedDate(getFormatedDate(dataCurrent.dt));
-    }
-    console.log(formatedDate);
-  }, [dataCurrent]);
+    console.log(`fav loc`, favLocations);
+  }, [favLocations]);
 
   return (
     <CardWrapper>
@@ -193,27 +259,24 @@ const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
         ) : (
           <>
             <CardHeader>
-              <StyledIconWrapper>
-                <IconPlus />
+              <StyledIconWrapper
+                onClick={() => {
+                  onHadleClick();
+                }}
+              >
+                {!favLocations.includes(currentLocation.value) ? (
+                  <IconPlus />
+                ) : (
+                  <IconAdd />
+                )}
               </StyledIconWrapper>
-              <StyledFlex direction='column' align='center'>
-                <CardTitle>{dataCurrent?.name}</CardTitle>
-                <PaginationList>
-                  <PaginationListItem active>
-                    <IconPagination />
-                  </PaginationListItem>
-                  <PaginationListItem>
-                    <IconPagination />
-                  </PaginationListItem>
-                  <PaginationListItem>
-                    <IconPagination />
-                  </PaginationListItem>
-                </PaginationList>
-              </StyledFlex>
+
+              <CardTitle>{dataCurrent?.name}</CardTitle>
+
               <Link to='/'>
-                <StyledIconWrapper>
-                  <IconMenu />
-                </StyledIconWrapper>
+                <StyledIconWrapperArrow>
+                  <IconArrow />
+                </StyledIconWrapperArrow>
               </Link>
             </CardHeader>
             <CardMain>
@@ -225,12 +288,14 @@ const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
               </CardMainImgContainer>
               <CardMainInfoContainer>
                 <CardDateContainer>
-                  <CardDate>{formatedDate?.weekday}</CardDate>|
-                  <CardDate>{formatedDate?.monthAndDay}</CardDate>
+                  <CardDate>{date?.weekday}</CardDate>|
+                  <CardDate>{date?.time}</CardDate>
                 </CardDateContainer>
                 <CardTemperature>
                   {Math.round(dataCurrent?.main.temp)}
-                  <IconDegree />
+                  <StyledIconWrapperDeg>
+                    <IconDegree />
+                  </StyledIconWrapperDeg>
                 </CardTemperature>
                 <CardText>{dataCurrent?.weather[0].description}</CardText>
               </CardMainInfoContainer>
@@ -255,9 +320,9 @@ const MainCard = ({ dataCurrent, loading }: MainCardProps) => {
                 <ParamsItemTextDescription>Cloudness</ParamsItemTextDescription>
               </ParamsItem>
               <ParamsItem>
-                <ParamsItemIcon>
+                <ParamsItemIconHum>
                   <IconParamPressure />
-                </ParamsItemIcon>
+                </ParamsItemIconHum>
                 <ParamsItemTextNum>
                   {dataCurrent?.main.humidity}%
                 </ParamsItemTextNum>

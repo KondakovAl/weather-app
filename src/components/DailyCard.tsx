@@ -9,11 +9,12 @@ import { ReactComponent as IconHourly1 } from '../assets/images/icon_hourly_1.sv
 
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
-import { Key, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Loader } from '../styles/Loader';
 
 const CardWrapper = styled.div`
-  background: ${bgColors.bgMain};
+  background: ${(props) => props.theme.background};
+  color: ${(props) => props.theme.color};
   width: 100%;
 `;
 
@@ -38,9 +39,9 @@ const CardMini = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 10px 24px;
-  border-top: 1px solid ${colors.lightColor};
+  border-top: 1px solid ${(props) => props.theme.color};
   &:last-child {
-    border-bottom: 1px solid ${colors.lightColor};
+    border-bottom: 1px solid ${(props) => props.theme.color};
   }
 `;
 
@@ -68,7 +69,12 @@ const CardIcon = styled.img`
 
 const CardTempContainer = styled.div`
   display: flex;
+  justify-content: end;
   gap: 3px;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 20px;
+  min-width: 79px;
 `;
 
 const CardTemp = styled.span``;
@@ -103,8 +109,6 @@ const DailyCard = ({ dataDaily, loading }: DailyCardProps) => {
     );
     console.log(filtredArr);
   }, [dataDaily]);
-
-  console.log(forecastDays);
 
   return (
     <CardWrapper>

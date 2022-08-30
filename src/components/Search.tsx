@@ -9,13 +9,15 @@ import { ReactComponent as IconSearch } from '../assets/images/icon_search.svg';
 
 /*Import Styles*/
 
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, forwardRef, useEffect, useRef, useState } from 'react';
 import { getLocation } from '../api/getLocation';
 import { useDebounce } from '../hooks/useDebounce';
 import { Loader } from '../styles/Loader';
+import React from 'react';
 
 const StyledLabel = styled.label`
   /*Change to maxWidth!!*/
+
   position: relative;
   width: 100%;
   display: flex;
@@ -26,6 +28,11 @@ const StyledLabel = styled.label`
   gap: 8px;
   margin-bottom: 32px;
   z-index: 1;
+  transition: background-color 0.5s ease, outline 0.5s ease;
+  &:focus-within {
+    background-color: #d8d8d8;
+    outline: 1px solid black;
+  }
 `;
 
 const StyledInput = styled.input`
@@ -35,96 +42,116 @@ const StyledInput = styled.input`
   width: 100%;
   outline: none;
   border: none;
+  transition: background-color 0.5s ease;
+  &:focus {
+    background-color: #d8d8d8;
+  }
 `;
 
 const StyledIconWrapper = styled.div`
   display: flex;
+  z-index: 10;
 `;
 
-const AutoComplite = styled.ul`
-  /* display: none; */
+interface AutoCompliteProps {
+  search: boolean;
+}
+
+const AutoComplite = styled.ul<AutoCompliteProps>`
   position: absolute;
-  padding-top: 15px;
   color: black;
   width: 100%;
   left: 0;
-  top: 20px;
+  top: 40px;
   background: ${bgColors.bgInput};
+  border: ${(p) => (p.search ? '1px solid black;' : 'none')};
   z-index: -1;
-  border-radius: 0 0 16px 16px;
+  border-radius: 16px;
   overflow: hidden;
 `;
 
 const AutoCompliteItem = styled.li`
   padding: 15px;
-  transition: background 0.3s ease-in;
+  transition: background-color 0.3s ease-in;
   &:hover {
-    background: ${bgColors.bgGreyColor};
+    background-color: #d8d8d8;
   }
+`;
+
+const AutoCompliteMessage = styled.div`
+  padding: 15px;
 `;
 
 interface SearchProps {
   setCurrentLocation: (currentLocation: string) => void;
+  // ref?: React.MutableRefObject<HTMLInputElement> | any;
 }
 
-const Search = ({ setCurrentLocation }: SearchProps) => {
-  const [search, setSearch] = useState<string | undefined | null>();
-  const [location, setLocation] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>();
+const Search = React.forwardRef(
+  (
+    { setCurrentLocation }: SearchProps,
+    ref: React.ForwardedRef<HTMLInputElement>
+  ) => {
+    const [search, setSearch] = useState<string | undefined | null>();
+    const [location, setLocation] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean | undefined>();
 
-  const debouncedSearch = useDebounce(search, 600);
+    const debouncedSearch = useDebounce(search, 600);
 
-  const handleChange = (e: FormEvent<HTMLInputElement>) => {
-    setSearch(e.currentTarget.value);
-  };
+    const handleChange = (e: FormEvent<HTMLInputElement>) => {
+      setSearch(e.currentTarget.value);
+    };
 
-  const handleClear = () => {
-    setSearch('');
-  };
+    const handleClear = () => {
+      setSearch('');
+    };
 
-  useEffect(() => {
-    if (debouncedSearch) {
-      setLoading(true);
-      getLocation(debouncedSearch).then((res) => {
-        setLoading(false);
-        setLocation(res);
-      });
-    }
-    console.log(loading);
-  }, [debouncedSearch]);
+    useEffect(() => {
+      if (debouncedSearch) {
+        setLoading(true);
+        getLocation(debouncedSearch).then((res) => {
+          setLoading(false);
+          setLocation(res);
+        });
+      }
+      console.log(loading);
+    }, [debouncedSearch]);
 
-  return (
-    <StyledLabel>
-      <StyledIconWrapper>
-        <IconSearch />
-      </StyledIconWrapper>
-      <StyledInput
-        placeholder='Search Your City'
-        type='text'
-        onChange={handleChange}
-      />
-      <AutoComplite>
-        {loading ? (
-          <Loader />
-        ) : (
-          location &&
-          location.map((l: any, index: number) => (
-            <Link to='/card' key={index}>
-              <AutoCompliteItem
-                onClick={() => {
-                  setCurrentLocation(l);
-                  setLocation([]);
-                  handleClear();
-                }}
-              >
-                {l.label}
-              </AutoCompliteItem>
-            </Link>
-          ))
-        )}
-      </AutoComplite>
-    </StyledLabel>
-  );
-};
-
+    return (
+      <StyledLabel>
+        <StyledIconWrapper>
+          <IconSearch />
+        </StyledIconWrapper>
+        <StyledInput
+          placeholder='Search Your City'
+          type='text'
+          onChange={handleChange}
+          ref={ref}
+        />
+        <AutoComplite search={debouncedSearch}>
+          {loading && <Loader />}
+          {!loading && location?.length == 0 && debouncedSearch && (
+            <AutoCompliteMessage>No such location</AutoCompliteMessage>
+          )}
+          {!loading &&
+            debouncedSearch &&
+            location &&
+            location.map((l: any, index: number) => (
+              <Link to='/card' key={index}>
+                <AutoCompliteItem
+                  onClick={() => {
+                    setCurrentLocation(l);
+                    setLocation([]);
+                    handleClear();
+                  }}
+                >
+                  {l.label}
+                </AutoCompliteItem>
+              </Link>
+            ))}
+        </AutoComplite>
+      </StyledLabel>
+    );
+  }
+);
 export { Search };
