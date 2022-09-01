@@ -23,9 +23,8 @@ import { Loader } from '../styles/Loader';
 import { useState, useEffect } from 'react';
 
 const CardWrapper = styled.div`
-  max-width: 358px;
+  width: calc(100% - 40px);
   margin: 0 auto 16px;
-  width: 100%;
 `;
 
 const CardContainer = styled.div`
@@ -239,7 +238,7 @@ const MainCard = ({
   /*Add or Remove cards from fovorites*/
   const onHadleClick = () => {
     if (!favLocations.includes(currentLocation.value)) {
-      setFavLocations((arr: any) => [...arr, currentLocation.value]);
+      setFavLocations((arr: string[]) => [...arr, currentLocation.value]);
     } else {
       setFavLocations(
         favLocations.filter((p: any) => p !== currentLocation.value)

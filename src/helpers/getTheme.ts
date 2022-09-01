@@ -11,4 +11,5 @@ export const getTheme = (hour: number) => {
     if (hour > 20 && hour <= 24 || hour >= 0 && hour <= 5) {
         return `night`
     }
+    return `idle`
 }

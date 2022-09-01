@@ -13,6 +13,7 @@ import {
   morningTheme,
   nightTheme,
 } from './styles/variables';
+import { Context } from './context/context';
 
 const AppWrapper = styled.div`
   width: 100vw;
@@ -24,7 +25,7 @@ const AppWrapper = styled.div`
 `;
 
 const WeatherApp = styled.div`
-  width: 390px;
+  width: 450px;
   overflow-x: hidden;
   height: 100%;
 `;
@@ -32,7 +33,9 @@ const WeatherApp = styled.div`
 const App = () => {
   const [currentLocation, setCurrentLocation] = useState<string | any>();
   const [currentWeather, setCurrentWeather] = useState<any>();
+  const [otherWeather, setOtherWeather] = useState();
   const [favLocations, setFavLocations] = useState<any[]>([]);
+  const [coords, setCoords] = useState<any>();
   const [date, setDate] = useState<any>();
   const [theme, setTheme] = useState<string | undefined>('idle');
 
@@ -42,6 +45,7 @@ const App = () => {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
       setFavLocations([`${lat} ${lon}`]);
+      setCoords({ lon: lon.toFixed(1), lat: lat.toFixed(1) });
     });
   }, []);
 
@@ -89,12 +93,14 @@ const App = () => {
               path='/'
               element={
                 <SearchPage
-                  setCurrentLocation={setCurrentLocation}
                   currentLocation={currentLocation}
+                  setCurrentLocation={setCurrentLocation}
                   currentWeather={currentWeather}
+                  setOtherWeather={setOtherWeather}
                   setCurrentWeather={setCurrentWeather}
                   favLocations={favLocations}
                   setFavLocations={setFavLocations}
+                  coords={coords}
                 />
               }
             />
@@ -107,6 +113,8 @@ const App = () => {
                   setDate={setDate}
                   currentWeather={currentWeather}
                   setCurrentWeather={setCurrentWeather}
+                  otherWeather={otherWeather}
+                  setOtherWeather={setOtherWeather}
                   favLocations={favLocations}
                   setFavLocations={setFavLocations}
                 />

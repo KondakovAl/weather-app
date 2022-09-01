@@ -26,6 +26,8 @@ interface MainPageProps {
   setDate: (date: any) => void;
   currentWeather: any;
   setCurrentWeather: (currentWeather: any) => void;
+  otherWeather: any;
+  setOtherWeather: (otherWeather: any) => void;
   favLocations: any;
   setFavLocations: (favLocations: any) => void;
 }
@@ -36,10 +38,11 @@ const MainPage = ({
   setDate,
   currentWeather,
   setCurrentWeather,
+  otherWeather,
+  setOtherWeather,
   favLocations,
   setFavLocations,
 }: MainPageProps) => {
-  const [otherWeather, setOtherWeather] = useState();
   const [loadingCurrent, setLoadingCurrrent] = useState<boolean>(true);
   const [loadingDaily, setLoadingDaily] = useState<boolean>(true);
 

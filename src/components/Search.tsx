@@ -83,7 +83,7 @@ const AutoCompliteMessage = styled.div`
 `;
 
 interface SearchProps {
-  setCurrentLocation: (currentLocation: string) => void;
+  setCurrentLocation: (currentLocation: any) => void;
   // ref?: React.MutableRefObject<HTMLInputElement> | any;
 }
 
@@ -114,7 +114,6 @@ const Search = React.forwardRef(
           setLocation(res);
         });
       }
-      console.log(loading);
     }, [debouncedSearch]);
 
     return (
