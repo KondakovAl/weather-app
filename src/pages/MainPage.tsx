@@ -6,15 +6,35 @@ import { MainCard } from '../components/MainCard';
 import { DailyCard } from '../components/DailyCard';
 import { bgColors } from '../styles/variables';
 import { getDate } from '../helpers/getFormatedDate';
+import { SkeletonLoader } from '../styles/Loader';
 
 const WeatherApp = styled.div`
   display: flex;
-
   flex-direction: column;
   padding: 15px 0;
   background-color: ${bgColors.bgLightColor};
   width: 100%;
   height: 100%;
+`;
+
+const LoaderCurrent = styled(SkeletonLoader)`
+  width: calc(100% - 40px);
+  height: 353px;
+  border-radius: 30px;
+  margin: 0 auto 16px;
+`;
+
+const LoaderHourly = styled(SkeletonLoader)`
+  width: 100%;
+  height: 157px;
+  margin-bottom: 16px;
+  animation-delay: 0.4s;
+`;
+
+const LoaderDaily = styled(SkeletonLoader)`
+  width: 100%;
+  height: 375px;
+  animation-delay: 0.8s;
 `;
 
 interface MainPageProps {
@@ -43,25 +63,24 @@ const MainPage = ({
   favLocations,
   setFavLocations,
 }: MainPageProps) => {
-  const [loadingCurrent, setLoadingCurrrent] = useState<boolean>(true);
-  const [loadingDaily, setLoadingDaily] = useState<boolean>(true);
+  const [loadingWeather, setLoadingWeather] = useState<boolean>(true);
 
   useEffect(() => {
     if (currentLocation) {
       const [lat, lon] = currentLocation.value.split(' ');
-      getCurrentWeather(lat, lon).then((res) => {
-        setCurrentWeather({ city: currentLocation.label, ...res });
-        setLoadingCurrrent(false);
-      });
-      getDailyWeather(lat, lon).then((res) => {
-        setOtherWeather(res);
-        setLoadingDaily(false);
+      Promise.all([
+        getCurrentWeather(lat, lon),
+        getDailyWeather(lat, lon),
+      ]).then((res) => {
+        setCurrentWeather(res[0]);
+        setOtherWeather(res[1]);
+        setLoadingWeather(false);
       });
     }
   }, [currentLocation]);
 
   useEffect(() => {
-    console.log(currentWeather);
+    console.log(`weather`, currentWeather);
   }, [currentWeather]);
 
   useEffect(() => {
@@ -76,20 +95,25 @@ const MainPage = ({
 
   return (
     <WeatherApp>
-      <MainCard
-        dataCurrent={currentWeather}
-        loading={loadingCurrent}
-        date={date}
-        favLocations={favLocations}
-        setFavLocations={setFavLocations}
-        currentLocation={currentLocation}
-      />
-      <HourlyCard
-        dataHourly={otherWeather}
-        loading={loadingDaily}
-        date={date}
-      />
-      <DailyCard dataDaily={otherWeather} loading={loadingDaily} />
+      {loadingWeather ? (
+        <>
+          <LoaderCurrent />
+          <LoaderHourly />
+          <LoaderDaily />
+        </>
+      ) : (
+        <>
+          <MainCard
+            dataCurrent={currentWeather}
+            date={date}
+            favLocations={favLocations}
+            setFavLocations={setFavLocations}
+            currentLocation={currentLocation}
+          />
+          <HourlyCard dataHourly={otherWeather} date={date} />
+          <DailyCard dataDaily={otherWeather} />
+        </>
+      )}
     </WeatherApp>
   );
 };

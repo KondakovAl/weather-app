@@ -1,3 +1,17 @@
 {
-    "plugins": ["babel-plugin-styled-components"]
-  }
+    "env": {
+        "development": {
+            "plugins": [
+                ["styled-components", { "displayName": true, "preprocess": false } ]
+            ]
+        },
+        "production": {
+            "plugins": [
+                ["styled-components", { "displayName": true, "preprocess": false } ]
+            ]
+        }
+    },
+    "plugins": [
+        ["styled-components", {"displayName": true, "preprocess": false } ]
+    ]
+}

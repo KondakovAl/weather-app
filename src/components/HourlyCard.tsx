@@ -1,15 +1,8 @@
 import styled from 'styled-components';
 
-/*Import Variables*/
-import { bgColors } from '../styles/variables';
-
-/*Import Images*/
-
-import { ReactComponent as IconHourly1 } from '../assets/images/icon_hourly_1.svg';
-
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
-import { getDate, getFormatedHours } from '../helpers/getFormatedDate';
+import { getFormatedHours } from '../helpers/getFormatedDate';
 import { useEffect, useState } from 'react';
 
 const CardWrapper = styled.div`
@@ -17,6 +10,7 @@ const CardWrapper = styled.div`
   color: ${(props) => props.theme.color};
   margin-bottom: 16px;
   width: 100%;
+  min-height: 157px;
 `;
 
 const CardDateContainer = styled.div`
@@ -87,7 +81,6 @@ const CardRain = styled.div``;
 
 interface HourlyCardProps {
   dataHourly: any;
-  loading: boolean;
   date: {
     hour: number;
     time: string;
@@ -96,7 +89,7 @@ interface HourlyCardProps {
   };
 }
 
-const HourlyCard = ({ dataHourly, loading, date }: HourlyCardProps) => {
+const HourlyCard = ({ dataHourly, date }: HourlyCardProps) => {
   const [hours, setHours] = useState<any>();
 
   useEffect(() => {

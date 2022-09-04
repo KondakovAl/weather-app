@@ -10,12 +10,13 @@ import { StyledFlex } from '../styles/StyledFlex';
 
 const CardWrapper = styled.div`
   background: ${bgColors.bgLightColor};
+  width: 100%;
   display: flex;
   justify-content: space-between;
   padding: 16px;
   border-radius: 16px;
   line-height: 20px;
-  margin-bottom: 10px;
+  margin: 0 auto;
   height: 80px;
   user-select: none;
 `;
@@ -26,6 +27,10 @@ const CardContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 5px;
+`;
+
+const CardContainerRight = styled(CardContainer)`
+  padding-right: 10px;
 `;
 
 const CardCity = styled.div`
@@ -96,17 +101,20 @@ const LocationCard = ({ card, coords }: LocationCardProps) => {
           <CardTemp>{card?.main?.temp_max.toFixed(1)}°</CardTemp>
         </CardTempContainer>
       </CardContainer>
-      <CardContainer>
+      <CardContainerRight>
         <CardIconContainer>
           <CardIcon
             alt={card?.weather[0]?.description}
-            src={require(`../assets/images/weatherCurrentIcons/${card?.weather[0]?.icon}.png`)}
+            src={
+              card?.weather[0]?.icon &&
+              require(`../assets/images/weatherCurrentIcons/${card?.weather[0]?.icon}.png`)
+            }
           />
         </CardIconContainer>
         <CardWeatherDescription>
           {card?.weather[0].description}
         </CardWeatherDescription>
-      </CardContainer>
+      </CardContainerRight>
     </CardWrapper>
   );
 };

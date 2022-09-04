@@ -1,12 +1,12 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 /*Import Variables*/
-import { gradients } from '../styles/variables';
-import { colors, bgColors } from '../styles/variables';
+import { bgColors } from '../styles/variables';
 
 /*Import Images*/
 import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
 import { ReactComponent as IconAdd } from '../assets/images/icon_add.svg';
+import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
 
 import { ReactComponent as IconDegree } from '../assets/images/icon_degree.svg';
 import { ReactComponent as IconParamWind } from '../assets/images/icon_param_wind.svg';
@@ -14,13 +14,9 @@ import { ReactComponent as IconParamCloudness } from '../assets/images/icon_para
 import { ReactComponent as IconParamPressure } from '../assets/images/icon_param_pressure.svg';
 import { ReactComponent as IconParamHumidity } from '../assets/images/icon_param_humidity.svg';
 
-/*Import Images*/
-import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
 /*Import Styles*/
-import { StyledFlex } from '../styles/StyledFlex';
 import { Link } from 'react-router-dom';
 import { Loader } from '../styles/Loader';
-import { useState, useEffect } from 'react';
 
 const CardWrapper = styled.div`
   width: calc(100% - 40px);
@@ -216,7 +212,6 @@ interface MainCardProps {
     label: string;
   };
   dataCurrent: any;
-  loading: boolean;
   date: {
     hour: number;
     time: string;
@@ -230,7 +225,6 @@ interface MainCardProps {
 const MainCard = ({
   currentLocation,
   dataCurrent,
-  loading,
   date,
   favLocations,
   setFavLocations,
@@ -246,99 +240,85 @@ const MainCard = ({
     }
   };
 
-  useEffect(() => {
-    console.log(`fav loc`, favLocations);
-  }, [favLocations]);
-
   return (
     <CardWrapper>
       <CardContainer>
-        {loading ? (
-          <LoaderCurrent />
-        ) : (
-          <>
-            <CardHeader>
-              <StyledIconWrapper
-                onClick={() => {
-                  onHadleClick();
-                }}
-              >
-                {!favLocations.includes(currentLocation.value) ? (
-                  <IconPlus />
-                ) : (
-                  <IconAdd />
-                )}
-              </StyledIconWrapper>
+        <CardHeader>
+          <StyledIconWrapper
+            onClick={() => {
+              onHadleClick();
+            }}
+          >
+            {!favLocations.includes(currentLocation.value) ? (
+              <IconPlus />
+            ) : (
+              <IconAdd />
+            )}
+          </StyledIconWrapper>
 
-              <CardTitle>{dataCurrent?.name}</CardTitle>
+          <CardTitle>{dataCurrent?.name}</CardTitle>
 
-              <Link to='/'>
-                <StyledIconWrapperArrow>
-                  <IconArrow />
-                </StyledIconWrapperArrow>
-              </Link>
-            </CardHeader>
-            <CardMain>
-              <CardMainImgContainer>
-                <CardMainImg
-                  alt={dataCurrent?.weather[0].description}
-                  src={require(`../assets/images/weatherCurrentIcons/${dataCurrent?.weather[0].icon}.png`)}
-                />
-              </CardMainImgContainer>
-              <CardMainInfoContainer>
-                <CardDateContainer>
-                  <CardDate>{date?.weekday}</CardDate>|
-                  <CardDate>{date?.time}</CardDate>
-                </CardDateContainer>
-                <CardTemperature>
-                  {Math.round(dataCurrent?.main.temp)}
-                  <StyledIconWrapperDeg>
-                    <IconDegree />
-                  </StyledIconWrapperDeg>
-                </CardTemperature>
-                <CardText>{dataCurrent?.weather[0].description}</CardText>
-              </CardMainInfoContainer>
-            </CardMain>
-            <ParamsContainer>
-              <ParamsItem>
-                <ParamsItemIconWind rotation={dataCurrent?.wind.deg}>
-                  <IconParamWind />
-                </ParamsItemIconWind>
-                <ParamsItemTextNum>
-                  {dataCurrent?.wind.speed} km/h
-                </ParamsItemTextNum>
-                <ParamsItemTextDescription>Wind</ParamsItemTextDescription>
-              </ParamsItem>
-              <ParamsItem>
-                <ParamsItemIcon>
-                  <IconParamCloudness />
-                </ParamsItemIcon>
-                <ParamsItemTextNum>
-                  {dataCurrent?.clouds.all}%
-                </ParamsItemTextNum>
-                <ParamsItemTextDescription>Cloudness</ParamsItemTextDescription>
-              </ParamsItem>
-              <ParamsItem>
-                <ParamsItemIconHum>
-                  <IconParamPressure />
-                </ParamsItemIconHum>
-                <ParamsItemTextNum>
-                  {dataCurrent?.main.humidity}%
-                </ParamsItemTextNum>
-                <ParamsItemTextDescription>Humidity</ParamsItemTextDescription>
-              </ParamsItem>
-              <ParamsItem>
-                <ParamsItemIcon>
-                  <IconParamHumidity />
-                </ParamsItemIcon>
-                <ParamsItemTextNum>
-                  {dataCurrent?.main.pressure} mbar
-                </ParamsItemTextNum>
-                <ParamsItemTextDescription>Pressure</ParamsItemTextDescription>
-              </ParamsItem>
-            </ParamsContainer>
-          </>
-        )}
+          <Link to='/'>
+            <StyledIconWrapperArrow>
+              <IconArrow />
+            </StyledIconWrapperArrow>
+          </Link>
+        </CardHeader>
+        <CardMain>
+          <CardMainImgContainer>
+            <CardMainImg
+              alt={dataCurrent?.weather[0].description}
+              src={require(`../assets/images/weatherCurrentIcons/${dataCurrent?.weather[0].icon}.png`)}
+            />
+          </CardMainImgContainer>
+          <CardMainInfoContainer>
+            <CardDateContainer>
+              <CardDate>{date?.weekday}</CardDate>|
+              <CardDate>{date?.time}</CardDate>
+            </CardDateContainer>
+            <CardTemperature>
+              {Math.round(dataCurrent?.main.temp)}
+              <StyledIconWrapperDeg>
+                <IconDegree />
+              </StyledIconWrapperDeg>
+            </CardTemperature>
+            <CardText>{dataCurrent?.weather[0].description}</CardText>
+          </CardMainInfoContainer>
+        </CardMain>
+        <ParamsContainer>
+          <ParamsItem>
+            <ParamsItemIconWind rotation={dataCurrent?.wind.deg}>
+              <IconParamWind />
+            </ParamsItemIconWind>
+            <ParamsItemTextNum>
+              {dataCurrent?.wind.speed} km/h
+            </ParamsItemTextNum>
+            <ParamsItemTextDescription>Wind</ParamsItemTextDescription>
+          </ParamsItem>
+          <ParamsItem>
+            <ParamsItemIcon>
+              <IconParamCloudness />
+            </ParamsItemIcon>
+            <ParamsItemTextNum>{dataCurrent?.clouds.all}%</ParamsItemTextNum>
+            <ParamsItemTextDescription>Cloudness</ParamsItemTextDescription>
+          </ParamsItem>
+          <ParamsItem>
+            <ParamsItemIconHum>
+              <IconParamPressure />
+            </ParamsItemIconHum>
+            <ParamsItemTextNum>{dataCurrent?.main.humidity}%</ParamsItemTextNum>
+            <ParamsItemTextDescription>Humidity</ParamsItemTextDescription>
+          </ParamsItem>
+          <ParamsItem>
+            <ParamsItemIcon>
+              <IconParamHumidity />
+            </ParamsItemIcon>
+            <ParamsItemTextNum>
+              {dataCurrent?.main.pressure} mbar
+            </ParamsItemTextNum>
+            <ParamsItemTextDescription>Pressure</ParamsItemTextDescription>
+          </ParamsItem>
+        </ParamsContainer>
       </CardContainer>
     </CardWrapper>
   );

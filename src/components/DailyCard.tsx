@@ -1,11 +1,7 @@
 import styled from 'styled-components';
 
 /*Import Variables*/
-import { bgColors, colors } from '../styles/variables';
-
-/*Import Images*/
-
-import { ReactComponent as IconHourly1 } from '../assets/images/icon_hourly_1.svg';
+import { bgColors } from '../styles/variables';
 
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
@@ -16,6 +12,7 @@ const CardWrapper = styled.div`
   background: ${(props) => props.theme.background};
   color: ${(props) => props.theme.color};
   width: 100%;
+  min-height: 375px;
 `;
 
 const CardDate = styled.div`
@@ -91,12 +88,11 @@ const LoaderDaily = styled(Loader)`
 
 interface DailyCardProps {
   dataDaily: any;
-  loading: boolean;
 }
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const DailyCard = ({ dataDaily, loading }: DailyCardProps) => {
+const DailyCard = ({ dataDaily }: DailyCardProps) => {
   const dayInAWeek = new Date().getDay();
   const forecastDays = WEEK_DAYS.slice(dayInAWeek - 1, WEEK_DAYS.length).concat(
     WEEK_DAYS.slice(0, dayInAWeek - 1)
@@ -107,7 +103,6 @@ const DailyCard = ({ dataDaily, loading }: DailyCardProps) => {
     const filtredArr = dataDaily?.list.filter(
       (elem: any) => dataDaily.list.indexOf(elem) % 8 == 0
     );
-    console.log(filtredArr);
   }, [dataDaily]);
 
   return (
@@ -115,34 +110,27 @@ const DailyCard = ({ dataDaily, loading }: DailyCardProps) => {
       <StyledFlex direction='column'>
         <CardDate>Forcast for 5 Days</CardDate>
         <CardInfoContainer>
-          {loading ? (
-            <LoaderDaily />
-          ) : (
-            <>
-              {dataDaily &&
-                dataDaily?.list
-                  .filter((elem: any) => dataDaily.list.indexOf(elem) % 8 == 0)
-                  .map((item: any, index: number) => (
-                    <CardMini key={index}>
-                      <CardDay>{forecastDays[index]}</CardDay>
-                      <CardMiniContainer>
-                        <CardIconContainer>
-                          <CardIcon
-                            alt={item?.weather[0].description}
-                            src={require(`../assets/images/weatherOtherIcons/${item?.weather[0].icon}.svg`)}
-                          />
-                        </CardIconContainer>
-                        <CardText>{item?.weather[0].description}</CardText>
-                      </CardMiniContainer>
-                      <CardTempContainer>
-                        {/* {item?.main.temp.toFixed(1)}° */}
-                        <CardTemp>{item?.main.temp_min.toFixed(1)}°</CardTemp>/
-                        <CardTemp>{item?.main.temp_max.toFixed(1)}°</CardTemp>
-                      </CardTempContainer>
-                    </CardMini>
-                  ))}
-            </>
-          )}
+          {dataDaily &&
+            dataDaily?.list
+              .filter((elem: any) => dataDaily.list.indexOf(elem) % 8 == 0)
+              .map((item: any, index: number) => (
+                <CardMini key={index}>
+                  <CardDay>{forecastDays[index]}</CardDay>
+                  <CardMiniContainer>
+                    <CardIconContainer>
+                      <CardIcon
+                        alt={item?.weather[0].description}
+                        src={require(`../assets/images/weatherOtherIcons/${item?.weather[0].icon}.svg`)}
+                      />
+                    </CardIconContainer>
+                    <CardText>{item?.weather[0].description}</CardText>
+                  </CardMiniContainer>
+                  <CardTempContainer>
+                    <CardTemp>{item?.main.temp_min.toFixed(1)}°</CardTemp>/
+                    <CardTemp>{item?.main.temp_max.toFixed(1)}°</CardTemp>
+                  </CardTempContainer>
+                </CardMini>
+              ))}
         </CardInfoContainer>
       </StyledFlex>
     </CardWrapper>

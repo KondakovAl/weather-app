@@ -1,5 +1,5 @@
 import styled, { ThemeProvider } from 'styled-components';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { MainPage } from './pages/MainPage';
 import { SearchPage } from './pages/SearchPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -13,7 +13,6 @@ import {
   morningTheme,
   nightTheme,
 } from './styles/variables';
-import { Context } from './context/context';
 
 const AppWrapper = styled.div`
   width: 100vw;
@@ -66,9 +65,8 @@ const App = () => {
   };
 
   useEffect(() => {
-    setTheme('idle');
     switchTheme();
-  }, [date]);
+  }, [date, currentLocation]);
 
   return (
     <ThemeProvider

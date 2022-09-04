@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 
 /*Import Variables*/
@@ -7,12 +7,14 @@ import { bgColors, gradients, colors } from '../styles/variables';
 /*Import Images*/
 import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
 import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
+import { ReactComponent as IconDots } from '../assets/images/icon_dots.svg';
 
 /*Import Components*/
 import { LocationCard } from '../components/LocationCard';
 import { Search } from '../components/Search';
 import { useRef, useEffect, useState } from 'react';
-import { getCurrentWeather, getDailyWeather } from '../api/getWeatherData';
+import { getCurrentWeather } from '../api/getWeatherData';
+import { SkeletonLoader } from '../styles/Loader';
 
 const WeatherApp = styled.div`
   height: 100%;
@@ -46,12 +48,20 @@ const CardTitle = styled.h2`
   margin: 0 auto;
 `;
 
+const CardsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+`;
+
 interface StyledIconWrapperProps {
   currentLocation: any;
+  favLocations: any;
 }
 
 const StyledIconWrapper = styled.div<StyledIconWrapperProps>`
-  display: ${(p) => (p.currentLocation ? 'flex' : 'none')};
+  display: ${(p) => (p.currentLocation && p.favLocations ? 'flex' : 'none')};
   cursor: pointer;
 `;
 
@@ -78,29 +88,85 @@ const CardIconContainer = styled.div`
   }
 `;
 
-const wave = keyframes`
-  to {
-    background-position: 120% 0;
+const shake = keyframes`
+   0% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-2deg); }
+  100% { transform: rotate(0deg); }
+`;
+
+const LocationCardContainer = styled.div<{ isDraggable: boolean }>`
+  position: relative;
+  display: flex;
+  align-self: center;
+  width: calc(100% - 10px);
+  margin: 0 auto;
+  animation: ${(p) =>
+    p.isDraggable
+      ? css`
+          ${shake} 1s linear infinite
+        `
+      : 'none'};
+`;
+
+const DotsContainer = styled.div`
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 5px;
+  padding: 5px;
+  height: fit-content;
+`;
+
+const PopUp = styled.ul`
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(-10%, -120%);
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  font-weight: 600;
+  background: ${colors.lightColor};
+  color: ${colors.cardsLocationColor};
+  border: 1px solid ${colors.cardsLocationColor};
+  border-radius: 10px;
+  z-index: 1000;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    right: 10px;
+    border: 10px solid transparent;
+    border-bottom: none;
+    border-top: 16px solid ${colors.lightColor};
+  }
+  &:before {
+    content: '';
+    position: absolute;
+    bottom: -17px;
+    right: 10px;
+    border: 10px solid transparent;
+    border-bottom: none;
+    border-top: 16px solid ${colors.cardsLocationColor};
   }
 `;
 
-const LoaderFav = styled.div<{ transitionDelay: number }>`
-  display: block;
-  width: 100%;
+const PopUpItems = styled.li`
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: background-color 1s ease;
+  &:first-child {
+    border-bottom: 1px solid ${colors.cardsLocationColor};
+  }
+`;
+
+const LoaderFav = styled(SkeletonLoader)<{ transitionDelay: number }>`
   height: 80px;
   border-radius: 16px;
-  background: linear-gradient(
-      to right,
-      rgba(200, 200, 200, 0),
-      rgba(200, 200, 200, 0.5) 50%,
-      rgba(200, 200, 200, 0) 80%
-    ),
-    #ebebeb;
-  background-size: 50px;
-  background-repeat: repeat-y;
-  background-position: -20% 0;
   margin-bottom: 10px;
-  animation: ${wave} 3s ease infinite;
   animation-delay: ${(p) => p.transitionDelay + 's'};
 `;
 
@@ -123,11 +189,13 @@ const SearchPage = ({
   setCurrentLocation,
   setOtherWeather,
   favLocations,
+  setFavLocations,
   coords,
 }: SearchPageProps) => {
   const [favWeather, setFavWeather] = useState<any>([]);
   const [favLoading, setFavLoading] = useState<boolean>();
   const [currentCard, setCurrentCard] = useState<null | any>(null);
+  const [isDraggable, setIsDraggable] = useState<boolean>(false);
 
   const inputRef = useRef() as React.MutableRefObject<HTMLInputElement>;
 
@@ -135,58 +203,176 @@ const SearchPage = ({
     inputRef.current.focus();
   };
 
-  const getFavArr = () => {
-    const favArr: any = [];
+  const getFavArray = () => {
+    const favArray: any = [];
     favLocations.forEach((item: any) => {
-      const [lat, lon] = item.split(' ');
-      favArr.push(getCurrentWeather(lat, lon));
+      const [lat, lon] = item?.split(' ');
+      favArray.push(getCurrentWeather(lat, lon));
     });
-    console.log(`array`, favArr);
-    return favArr;
+    // console.log(`array`, favArray);
+    return favArray;
   };
 
   useEffect(() => {
     setFavLoading(true);
-    Promise.all(getFavArr()).then((res) => {
-      setFavWeather(res);
+    const favWeatherArray: any = [];
+    Promise.all(getFavArray()).then((res) => {
+      res.forEach((item, index) => {
+        favWeatherArray.push({
+          order: index,
+          ...item,
+          id: index,
+          open: false,
+        });
+      });
+      setFavWeather(favWeatherArray);
       setFavLoading(false);
     });
+  }, [currentLocation]);
+
+  const dragStartHandler = (e: React.DragEvent<HTMLDivElement>, card: any) => {
+    setCurrentCard(card);
+  };
+
+  const dragEndHandler = (e: React.DragEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    // target.style.background = `white`;
+  };
+
+  const dragOverHandler = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    // const target = e.target as HTMLDivElement;
+    // target.style.background = `lightgrey`;
+  };
+
+  const dropHandler = (e: React.DragEvent<HTMLDivElement>, card: any) => {
+    e.preventDefault();
+
+    let fav = [...favLocations];
+    let swap = fav[card.id];
+
+    const test = favWeather?.map((c: any) => {
+      if (c.id === card.id) {
+        console.log(`cardID`, card.id, currentCard.order);
+        console.log(`1`, fav);
+        fav[card.id] = fav[currentCard.order];
+        console.log(`2`, fav);
+        fav[currentCard.order] = swap;
+        console.log(`3`, fav);
+        return { ...c, order: currentCard.order };
+      }
+      if (c.id === currentCard.id) {
+        return { ...c, order: card.order };
+      }
+      return c;
+    });
+    setFavLocations(fav);
+    setFavWeather(test);
+    setIsDraggable(false);
+  };
+
+  const sortCards = (a: { order: number }, b: { order: number }) => {
+    if (a && b) {
+      if (a.order > b.order) {
+        return 1;
+      } else {
+        return -1;
+      }
+    }
+  };
+
+  useEffect(() => {
+    console.log(`locations`, favLocations);
   }, [favLocations]);
 
   useEffect(() => {
-    console.log(currentLocation);
-  }, [currentLocation]);
+    console.log(`weather`, favWeather);
+  }, [favWeather]);
+
+  const toggleOpen = (index: number) => {
+    let arrCopy = [...favWeather];
+    arrCopy[index].open
+      ? (arrCopy[index].open = false)
+      : (arrCopy[index].open = true);
+    console.log(arrCopy[index].open);
+    setFavWeather([...favWeather]);
+  };
 
   return (
     <WeatherApp>
       <Container>
         <CardHeader>
           <Link to='/card'>
-            <StyledIconWrapper currentLocation={currentLocation}>
+            <StyledIconWrapper
+              currentLocation={currentLocation}
+              favLocations={favLocations.length !== 0}
+            >
               <IconArrow />
             </StyledIconWrapper>
           </Link>
           <CardTitle>Manage Location</CardTitle>
         </CardHeader>
         <Search setCurrentLocation={setCurrentLocation} ref={inputRef} />
-        {favLoading
-          ? favLocations &&
-            favLocations.map((item: any, index: number) => (
-              <LoaderFav key={index} transitionDelay={index * 0.3} />
-            ))
-          : favWeather.length > 0 &&
-            favWeather.map((card: any, index: number) => (
-              <Link
-                to='/card'
-                key={index}
-                onClick={() => {
-                  setCurrentLocation({ value: favLocations[index] });
-                }}
-              >
-                <LocationCard card={card} coords={coords} />
-              </Link>
-            ))}
-
+        <CardsContainer>
+          {favLoading
+            ? favLocations &&
+              favLocations.map((item: any, index: number) => (
+                <LoaderFav key={index} transitionDelay={index * 0.3} />
+              ))
+            : favWeather.length > 0 &&
+              favWeather?.sort(sortCards).map((card: any, index: number) => (
+                <LocationCardContainer
+                  key={card.id}
+                  draggable={isDraggable}
+                  onDragStart={(e) => isDraggable && dragStartHandler(e, card)}
+                  onDragLeave={(e) => isDraggable && dragEndHandler(e)}
+                  onDragEnd={(e) => isDraggable && dragEndHandler(e)}
+                  onDragOver={(e) => isDraggable && dragOverHandler(e)}
+                  onDrop={(e) => isDraggable && dropHandler(e, card)}
+                  isDraggable={isDraggable}
+                >
+                  <Link
+                    to='/card'
+                    onClick={() => {
+                      setCurrentLocation({ value: favLocations[index] });
+                    }}
+                    style={{ width: '100%' }}
+                  >
+                    <LocationCard card={card} coords={coords} />
+                  </Link>
+                  <DotsContainer onClick={() => toggleOpen(card.id)}>
+                    <IconDots />
+                  </DotsContainer>
+                  {card.open && !isDraggable && (
+                    <PopUp>
+                      <PopUpItems
+                        onClick={() => {
+                          toggleOpen(card.id);
+                          setFavWeather(
+                            favWeather.filter((p: any) => p.id !== card.id)
+                          );
+                          setFavLocations(
+                            favLocations.filter(
+                              (p: any) => p !== favLocations[index]
+                            )
+                          );
+                        }}
+                      >
+                        Delete
+                      </PopUpItems>
+                      <PopUpItems
+                        onClick={() => {
+                          toggleOpen(card.id);
+                          setIsDraggable(!isDraggable);
+                        }}
+                      >
+                        Reorder
+                      </PopUpItems>
+                    </PopUp>
+                  )}
+                </LocationCardContainer>
+              ))}
+        </CardsContainer>
         <CardIconContainer onClick={focusHandler}>
           <IconPlus />
         </CardIconContainer>
@@ -196,28 +382,3 @@ const SearchPage = ({
 };
 
 export { SearchPage };
-
-// function dragStartHandler(e: React.DragEvent<HTMLDivElement>, card: any) {
-//   console.log(`drag`, card);
-//   setCurrentCard(card);
-// }
-
-// function dragEndHandler(e: React.DragEvent<HTMLDivElement>) {}
-
-// function dragOverHandler(e: React.DragEvent<HTMLDivElement>) {
-//   e.preventDefault();
-// }
-
-// function dropHandler(e: React.DragEvent<HTMLDivElement>, card: any) {
-//   e.preventDefault();
-//   console.log(`drop`, card);
-//   setFavWeather(favWeather.map((c: any) => {}));}
-
-//
-//   draggable={true}
-//   onDragStart={(e) => dragStartHandler(e, card)}
-//   onDragLeave={(e) => dragEndHandler(e)}
-//   onDragEnd={(e) => dragEndHandler(e)}
-//   onDragOver={(e) => dragOverHandler(e)}
-//   onDrop={(e) => dropHandler(e, card)}
-// >
