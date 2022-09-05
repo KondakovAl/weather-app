@@ -8,6 +8,7 @@ import { bgColors, gradients, colors } from '../styles/variables';
 import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
 import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
 import { ReactComponent as IconDots } from '../assets/images/icon_dots.svg';
+import checkMark from '../assets/images/icon_checkmark.svg';
 
 /*Import Components*/
 import { LocationCard } from '../components/LocationCard';
@@ -89,11 +90,11 @@ const CardIconContainer = styled.div`
 `;
 
 const shake = keyframes`
-   0% { transform: rotate(0deg); }
-  25% { transform: rotate(2deg); }
-  50% { transform: rotate(0deg); }
-  75% { transform: rotate(-2deg); }
-  100% { transform: rotate(0deg); }
+    0% { transform: translateY(0) }
+  25% { transform: translateY(2px) }
+  50% { transform: translateY(-2px) }
+  75% { transform: translateY(2px) }
+  100% { transform: translateY(0) }
 `;
 
 const LocationCardContainer = styled.div<{ isDraggable: boolean }>`
@@ -105,7 +106,7 @@ const LocationCardContainer = styled.div<{ isDraggable: boolean }>`
   animation: ${(p) =>
     p.isDraggable
       ? css`
-          ${shake} 1s linear infinite
+          ${shake} 2s linear infinite
         `
       : 'none'};
 `;
@@ -167,7 +168,50 @@ const LoaderFav = styled(SkeletonLoader)<{ transitionDelay: number }>`
   height: 80px;
   border-radius: 16px;
   margin-bottom: 10px;
+  width: calc(100% - 10px);
+  margin: 0 auto;
   animation-delay: ${(p) => p.transitionDelay + 's'};
+`;
+
+const CheckboxWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  width: calc(100% - 10px);
+  margin: 0 auto 30px;
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  position: relative;
+  cursor: pointer;
+  padding: 10px 15px;
+  background: ${colors.lightColor};
+  color: ${colors.cardsLocationColor};
+  border: 1px solid ${colors.cardsLocationColor};
+  border-radius: 10px;
+`;
+
+const CheckboxInput = styled.input.attrs({
+  type: 'checkbox',
+})`
+  position: absolute;
+  visibility: hidden;
+  display: none;
+`;
+
+const CheckboxMark = styled.span<{ isDraggable: boolean }>`
+  display: flex;
+  position: relative;
+  border: 1px solid ${colors.cardsLocationColor};
+  background-image: url(${checkMark});
+  background-color: ${(props) =>
+    props.isDraggable ? `${bgColors.bgGreyColor}` : 'transparent'};
+  background-size: 12px 12px;
+  width: 14px;
+  height: 14px;
+  left: 0;
+  margin-right: 5px;
+  transition: background-color 0.3s ease;
 `;
 
 interface SearchPageProps {
@@ -187,7 +231,6 @@ interface SearchPageProps {
 const SearchPage = ({
   currentLocation,
   setCurrentLocation,
-  setOtherWeather,
   favLocations,
   setFavLocations,
   coords,
@@ -209,7 +252,6 @@ const SearchPage = ({
       const [lat, lon] = item?.split(' ');
       favArray.push(getCurrentWeather(lat, lon));
     });
-    // console.log(`array`, favArray);
     return favArray;
   };
 
@@ -219,8 +261,8 @@ const SearchPage = ({
     Promise.all(getFavArray()).then((res) => {
       res.forEach((item, index) => {
         favWeatherArray.push({
-          order: index,
           ...item,
+          order: index,
           id: index,
           open: false,
         });
@@ -228,7 +270,7 @@ const SearchPage = ({
       setFavWeather(favWeatherArray);
       setFavLoading(false);
     });
-  }, [currentLocation]);
+  }, [favLocations]);
 
   const dragStartHandler = (e: React.DragEvent<HTMLDivElement>, card: any) => {
     setCurrentCard(card);
@@ -268,16 +310,13 @@ const SearchPage = ({
     });
     setFavLocations(fav);
     setFavWeather(test);
-    setIsDraggable(false);
   };
 
   const sortCards = (a: { order: number }, b: { order: number }) => {
-    if (a && b) {
-      if (a.order > b.order) {
-        return 1;
-      } else {
-        return -1;
-      }
+    if (a.order > b.order) {
+      return 1;
+    } else {
+      return -1;
     }
   };
 
@@ -313,13 +352,22 @@ const SearchPage = ({
           <CardTitle>Manage Location</CardTitle>
         </CardHeader>
         <Search setCurrentLocation={setCurrentLocation} ref={inputRef} />
+        {favLocations.length > 1 && (
+          <CheckboxWrapper>
+            <CheckboxLabel onChange={() => setIsDraggable(!isDraggable)}>
+              <CheckboxInput />
+              <CheckboxMark isDraggable={isDraggable} />
+              draggable
+            </CheckboxLabel>
+          </CheckboxWrapper>
+        )}
         <CardsContainer>
           {favLoading
             ? favLocations &&
               favLocations.map((item: any, index: number) => (
                 <LoaderFav key={index} transitionDelay={index * 0.3} />
               ))
-            : favWeather.length > 0 &&
+            : favWeather &&
               favWeather?.sort(sortCards).map((card: any, index: number) => (
                 <LocationCardContainer
                   key={card.id}
@@ -331,23 +379,15 @@ const SearchPage = ({
                   onDrop={(e) => isDraggable && dropHandler(e, card)}
                   isDraggable={isDraggable}
                 >
-                  <Link
-                    to='/card'
-                    onClick={() => {
-                      setCurrentLocation({ value: favLocations[index] });
-                    }}
-                    style={{ width: '100%' }}
-                  >
-                    <LocationCard card={card} coords={coords} />
-                  </Link>
-                  <DotsContainer onClick={() => toggleOpen(card.id)}>
+                  <LocationCard card={card} coords={coords} />
+                  <DotsContainer onClick={() => toggleOpen(index)}>
                     <IconDots />
                   </DotsContainer>
                   {card.open && !isDraggable && (
                     <PopUp>
                       <PopUpItems
                         onClick={() => {
-                          toggleOpen(card.id);
+                          toggleOpen(index);
                           setFavWeather(
                             favWeather.filter((p: any) => p.id !== card.id)
                           );
@@ -360,13 +400,17 @@ const SearchPage = ({
                       >
                         Delete
                       </PopUpItems>
-                      <PopUpItems
-                        onClick={() => {
-                          toggleOpen(card.id);
-                          setIsDraggable(!isDraggable);
-                        }}
-                      >
-                        Reorder
+                      <PopUpItems>
+                        <Link
+                          to='/card'
+                          onClick={() => {
+                            setCurrentLocation({
+                              value: favLocations[card.id],
+                            });
+                          }}
+                        >
+                          to Card
+                        </Link>
                       </PopUpItems>
                     </PopUp>
                   )}
