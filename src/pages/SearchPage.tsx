@@ -308,19 +308,18 @@ const SearchPage = ({
           <CardTitle>Manage Location</CardTitle>
         </CardHeader>
         <Search setCurrentLocation={setCurrentLocation} ref={inputRef} />
-        {favLocations.length > 1 && (
-          <Transition in={isCheckboxAnimated} timeout={1000}>
-            {(state: string) => (
-              <CheckboxWrapper state={state}>
-                <CheckboxLabel onChange={() => setIsDraggable(!isDraggable)}>
-                  <CheckboxInput />
-                  <CheckboxMark isDraggable={isDraggable} />
-                  draggable
-                </CheckboxLabel>
-              </CheckboxWrapper>
-            )}
-          </Transition>
-        )}
+
+        <Transition in={isCheckboxAnimated} timeout={1000}>
+          {(state: string) => (
+            <CheckboxWrapper state={state}>
+              <CheckboxLabel onChange={() => setIsDraggable(!isDraggable)}>
+                <CheckboxInput />
+                <CheckboxMark isDraggable={isDraggable} />
+                draggable
+              </CheckboxLabel>
+            </CheckboxWrapper>
+          )}
+        </Transition>
 
         <CardsContainer>
           {favLoading

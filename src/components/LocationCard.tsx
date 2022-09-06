@@ -216,7 +216,11 @@ const LocationCard = ({
               {card?.weather[0].description}
             </CardWeatherDescription>
           </CardContainerRight>
-          <DotsContainer onClick={() => setIsOpen(!isOpen)}>
+          <DotsContainer
+            onClick={() => {
+              !isDraggable && setIsOpen(!isOpen);
+            }}
+          >
             <IconDots />
           </DotsContainer>
           {isOpen && !isDraggable && (
