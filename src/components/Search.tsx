@@ -26,12 +26,13 @@ const StyledLabel = styled.label`
   border-radius: 16px;
   padding: 0 16px;
   gap: 8px;
-  margin-bottom: 32px;
-  z-index: 1;
+  margin-bottom: 20px;
+  z-index: 0;
   transition: background-color 0.5s ease, outline 0.5s ease;
   &:focus-within {
     background-color: #d8d8d8;
     outline: 1px solid black;
+    z-index: 1;
   }
 `;
 

@@ -1,5 +1,6 @@
-import styled, { css, keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { Transition } from 'react-transition-group';
 
 /*Import Variables*/
 import { bgColors, gradients, colors } from '../styles/variables';
@@ -7,7 +8,7 @@ import { bgColors, gradients, colors } from '../styles/variables';
 /*Import Images*/
 import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
 import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
-import { ReactComponent as IconDots } from '../assets/images/icon_dots.svg';
+
 import checkMark from '../assets/images/icon_checkmark.svg';
 
 /*Import Components*/
@@ -24,6 +25,7 @@ const WeatherApp = styled.div`
 `;
 
 const Container = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -31,7 +33,8 @@ const Container = styled.div`
   padding: 16px;
   background: ${gradients.main};
   border-radius: 30px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 const CardHeader = styled.header`
@@ -89,79 +92,13 @@ const CardIconContainer = styled.div`
   }
 `;
 
-const shake = keyframes`
-    0% { transform: translateY(0) }
-  25% { transform: translateY(2px) }
-  50% { transform: translateY(-2px) }
-  75% { transform: translateY(2px) }
-  100% { transform: translateY(0) }
-`;
-
 const LocationCardContainer = styled.div<{ isDraggable: boolean }>`
   position: relative;
   display: flex;
   align-self: center;
   width: calc(100% - 10px);
   margin: 0 auto;
-  animation: ${(p) =>
-    p.isDraggable
-      ? css`
-          ${shake} 2s linear infinite
-        `
-      : 'none'};
-`;
-
-const DotsContainer = styled.div`
-  cursor: pointer;
-  position: absolute;
-  top: 10px;
-  right: 5px;
-  padding: 5px;
-  height: fit-content;
-`;
-
-const PopUp = styled.ul`
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(-10%, -120%);
-  display: flex;
-  flex-direction: column;
-  font-size: 16px;
-  font-weight: 600;
-  background: ${colors.lightColor};
-  color: ${colors.cardsLocationColor};
-  border: 1px solid ${colors.cardsLocationColor};
-  border-radius: 10px;
-  z-index: 1000;
-  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
-  &:after {
-    content: '';
-    position: absolute;
-    bottom: -15px;
-    right: 10px;
-    border: 10px solid transparent;
-    border-bottom: none;
-    border-top: 16px solid ${colors.lightColor};
-  }
-  &:before {
-    content: '';
-    position: absolute;
-    bottom: -17px;
-    right: 10px;
-    border: 10px solid transparent;
-    border-bottom: none;
-    border-top: 16px solid ${colors.cardsLocationColor};
-  }
-`;
-
-const PopUpItems = styled.li`
-  padding: 7px 10px;
-  cursor: pointer;
-  transition: background-color 1s ease;
-  &:first-child {
-    border-bottom: 1px solid ${colors.cardsLocationColor};
-  }
+  cursor: ${({ isDraggable }) => (isDraggable ? `grab` : 'default')};
 `;
 
 const LoaderFav = styled(SkeletonLoader)<{ transitionDelay: number }>`
@@ -173,15 +110,34 @@ const LoaderFav = styled(SkeletonLoader)<{ transitionDelay: number }>`
   animation-delay: ${(p) => p.transitionDelay + 's'};
 `;
 
-const CheckboxWrapper = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  width: calc(100% - 10px);
-  margin: 0 auto 30px;
+const CheckboxWrapper = styled.div<{
+  state: string;
+}>`
+  position: absolute;
+  bottom: 2%;
+  right: 4%;
+  transform: translateX(
+    ${({ state }) => {
+      switch (state) {
+        case 'entering':
+          return '0px';
+        case 'entered':
+          return '0px';
+        case 'exiting':
+          return '0px';
+        case 'exited':
+          return '400px';
+      }
+    }}
+  );
+  /* display: ${({ state }) => (state === 'exited' ? 'none' : 'flex')}; */
+  transition: transform 1s ease, display 1s ease 2s;
+  user-select: none;
 `;
 
 const CheckboxLabel = styled.label`
   display: flex;
+  width: fit-content;
   position: relative;
   cursor: pointer;
   padding: 10px 15px;
@@ -204,8 +160,8 @@ const CheckboxMark = styled.span<{ isDraggable: boolean }>`
   position: relative;
   border: 1px solid ${colors.cardsLocationColor};
   background-image: url(${checkMark});
-  background-color: ${(props) =>
-    props.isDraggable ? `${bgColors.bgGreyColor}` : 'transparent'};
+  background-color: ${({ isDraggable }) =>
+    isDraggable ? `${bgColors.bgGreyColor}` : 'transparent'};
   background-size: 12px 12px;
   width: 14px;
   height: 14px;
@@ -239,6 +195,7 @@ const SearchPage = ({
   const [favLoading, setFavLoading] = useState<boolean>();
   const [currentCard, setCurrentCard] = useState<null | any>(null);
   const [isDraggable, setIsDraggable] = useState<boolean>(false);
+  const [isCheckboxAnimated, setIsCheckboxAnimated] = useState<boolean>(false);
 
   const inputRef = useRef() as React.MutableRefObject<HTMLInputElement>;
 
@@ -264,7 +221,6 @@ const SearchPage = ({
           ...item,
           order: index,
           id: index,
-          open: false,
         });
       });
       setFavWeather(favWeatherArray);
@@ -274,6 +230,8 @@ const SearchPage = ({
 
   const dragStartHandler = (e: React.DragEvent<HTMLDivElement>, card: any) => {
     setCurrentCard(card);
+    // const target = e.target as HTMLDivElement;
+    // target.style.opacity = `1`;
   };
 
   const dragEndHandler = (e: React.DragEvent<HTMLDivElement>) => {
@@ -321,21 +279,19 @@ const SearchPage = ({
   };
 
   useEffect(() => {
-    console.log(`locations`, favLocations);
+    if (favLocations.length >= 0 && favLocations.length <= 1) {
+      setIsCheckboxAnimated(false);
+    }
+    if (favLocations.length > 1) {
+      setIsCheckboxAnimated(true);
+    }
+
+    console.log(`loc`, favLocations);
   }, [favLocations]);
 
   useEffect(() => {
     console.log(`weather`, favWeather);
   }, [favWeather]);
-
-  const toggleOpen = (index: number) => {
-    let arrCopy = [...favWeather];
-    arrCopy[index].open
-      ? (arrCopy[index].open = false)
-      : (arrCopy[index].open = true);
-    console.log(arrCopy[index].open);
-    setFavWeather([...favWeather]);
-  };
 
   return (
     <WeatherApp>
@@ -353,14 +309,19 @@ const SearchPage = ({
         </CardHeader>
         <Search setCurrentLocation={setCurrentLocation} ref={inputRef} />
         {favLocations.length > 1 && (
-          <CheckboxWrapper>
-            <CheckboxLabel onChange={() => setIsDraggable(!isDraggable)}>
-              <CheckboxInput />
-              <CheckboxMark isDraggable={isDraggable} />
-              draggable
-            </CheckboxLabel>
-          </CheckboxWrapper>
+          <Transition in={isCheckboxAnimated} timeout={1000}>
+            {(state: string) => (
+              <CheckboxWrapper state={state}>
+                <CheckboxLabel onChange={() => setIsDraggable(!isDraggable)}>
+                  <CheckboxInput />
+                  <CheckboxMark isDraggable={isDraggable} />
+                  draggable
+                </CheckboxLabel>
+              </CheckboxWrapper>
+            )}
+          </Transition>
         )}
+
         <CardsContainer>
           {favLoading
             ? favLocations &&
@@ -379,41 +340,16 @@ const SearchPage = ({
                   onDrop={(e) => isDraggable && dropHandler(e, card)}
                   isDraggable={isDraggable}
                 >
-                  <LocationCard card={card} coords={coords} />
-                  <DotsContainer onClick={() => toggleOpen(index)}>
-                    <IconDots />
-                  </DotsContainer>
-                  {card.open && !isDraggable && (
-                    <PopUp>
-                      <PopUpItems
-                        onClick={() => {
-                          toggleOpen(index);
-                          setFavWeather(
-                            favWeather.filter((p: any) => p.id !== card.id)
-                          );
-                          setFavLocations(
-                            favLocations.filter(
-                              (p: any) => p !== favLocations[index]
-                            )
-                          );
-                        }}
-                      >
-                        Delete
-                      </PopUpItems>
-                      <PopUpItems>
-                        <Link
-                          to='/card'
-                          onClick={() => {
-                            setCurrentLocation({
-                              value: favLocations[card.id],
-                            });
-                          }}
-                        >
-                          to Card
-                        </Link>
-                      </PopUpItems>
-                    </PopUp>
-                  )}
+                  <LocationCard
+                    card={card}
+                    coords={coords}
+                    setCurrentLocation={setCurrentLocation}
+                    favLocations={favLocations}
+                    setFavLocations={setFavLocations}
+                    favWeather={favWeather}
+                    setFavWeather={setFavWeather}
+                    isDraggable={isDraggable}
+                  />
                 </LocationCardContainer>
               ))}
         </CardsContainer>
