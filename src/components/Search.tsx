@@ -28,10 +28,10 @@ const StyledLabel = styled.label`
   gap: 8px;
   margin-bottom: 20px;
   z-index: 0;
-  transition: background-color 0.5s ease, outline 0.5s ease;
+  transition: background-color 0.5s ease, border 0.5s ease;
   &:focus-within {
     background-color: #d8d8d8;
-    outline: 1px solid black;
+    border: 1px solid black;
     z-index: 1;
   }
 `;
