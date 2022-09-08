@@ -1,22 +1,29 @@
+/*Import React*/
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Transition } from 'react-transition-group';
+import { useRef, useEffect, useState } from 'react';
 
-/*Import Variables*/
+/*Import Styles*/
 import { bgColors, gradients, colors } from '../styles/variables';
+import { SkeletonLoader } from '../styles/Loader';
 
 /*Import Images*/
 import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
 import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
-
 import checkMark from '../assets/images/icon_checkmark.svg';
 
 /*Import Components*/
 import { LocationCard } from '../components/LocationCard';
 import { Search } from '../components/Search';
-import { useRef, useEffect, useState } from 'react';
 import { getCurrentWeather } from '../api/getWeatherData';
-import { SkeletonLoader } from '../styles/Loader';
+
+/*Import Types*/
+import {
+  CoordsProps,
+  DragCardProps,
+  CurrentLocationProps,
+} from '../types/types';
 
 const WeatherApp = styled.div`
   height: 100%;
@@ -110,9 +117,7 @@ const LoaderFav = styled(SkeletonLoader)<{ transitionDelay: number }>`
   animation-delay: ${(p) => p.transitionDelay + 's'};
 `;
 
-const CheckboxWrapper = styled.div<{
-  state: string;
-}>`
+const CheckboxWrapper = styled.div<{ state: string }>`
   position: absolute;
   bottom: 2%;
   right: 4%;
@@ -130,9 +135,9 @@ const CheckboxWrapper = styled.div<{
       }
     }}
   );
-  /* display: ${({ state }) => (state === 'exited' ? 'none' : 'flex')}; */
   transition: transform 1s ease, display 1s ease 2s;
   user-select: none;
+  z-index: 100;
 `;
 
 const CheckboxLabel = styled.label`
@@ -171,17 +176,11 @@ const CheckboxMark = styled.span<{ isDraggable: boolean }>`
 `;
 
 interface SearchPageProps {
-  currentLocation: {
-    value: string;
-    label: string;
-  };
-  setCurrentLocation: (currentLocation: any) => void;
-  currentWeather: any;
-  setCurrentWeather: (currentWeather: any) => void;
-  favLocations: any;
-  setOtherWeather: (otherWeather: any) => void;
-  setFavLocations: (favLocations: any) => void;
-  coords: any;
+  currentLocation: CurrentLocationProps;
+  setCurrentLocation: (currentLocation: CurrentLocationProps) => void;
+  favLocations: string[];
+  setFavLocations: (favLocations: string[]) => void;
+  coords: CoordsProps;
 }
 
 const SearchPage = ({
@@ -193,7 +192,7 @@ const SearchPage = ({
 }: SearchPageProps) => {
   const [favWeather, setFavWeather] = useState<any>([]);
   const [favLoading, setFavLoading] = useState<boolean>();
-  const [currentCard, setCurrentCard] = useState<null | any>(null);
+  const [currentCard, setCurrentCard] = useState<null | DragCardProps>(null);
   const [isDraggable, setIsDraggable] = useState<boolean>(false);
   const [isCheckboxAnimated, setIsCheckboxAnimated] = useState<boolean>(false);
 
@@ -205,7 +204,7 @@ const SearchPage = ({
 
   const getFavArray = () => {
     const favArray: any = [];
-    favLocations.forEach((item: any) => {
+    favLocations.forEach((item: string) => {
       const [lat, lon] = item?.split(' ');
       favArray.push(getCurrentWeather(lat, lon));
     });
@@ -214,7 +213,7 @@ const SearchPage = ({
 
   useEffect(() => {
     setFavLoading(true);
-    const favWeatherArray: any = [];
+    const favWeatherArray: any[] = [];
     Promise.all(getFavArray()).then((res) => {
       res.forEach((item, index) => {
         favWeatherArray.push({
@@ -228,43 +227,42 @@ const SearchPage = ({
     });
   }, [favLocations]);
 
-  const dragStartHandler = (e: React.DragEvent<HTMLDivElement>, card: any) => {
+  const dragStartHandler = (
+    e: React.DragEvent<HTMLDivElement>,
+    card: DragCardProps
+  ) => {
     setCurrentCard(card);
     // const target = e.target as HTMLDivElement;
     // target.style.opacity = `1`;
   };
 
-  const dragEndHandler = (e: React.DragEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    // target.style.background = `white`;
-  };
-
   const dragOverHandler = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     // const target = e.target as HTMLDivElement;
-    // target.style.background = `lightgrey`;
+    // target.style.transform = `scale(0.5)`;
   };
 
-  const dropHandler = (e: React.DragEvent<HTMLDivElement>, card: any) => {
+  const dropHandler = (
+    e: React.DragEvent<HTMLDivElement>,
+    card: DragCardProps
+  ) => {
     e.preventDefault();
 
     let fav = [...favLocations];
     let swap = fav[card.id];
 
-    const test = favWeather?.map((c: any) => {
-      if (c.id === card.id) {
-        console.log(`cardID`, card.id, currentCard.order);
-        console.log(`1`, fav);
-        fav[card.id] = fav[currentCard.order];
-        console.log(`2`, fav);
-        fav[currentCard.order] = swap;
-        console.log(`3`, fav);
-        return { ...c, order: currentCard.order };
+    const test = favWeather?.map((c: DragCardProps) => {
+      if (currentCard != null) {
+        if (c.id === card.id) {
+          fav[card.id] = fav[currentCard.order];
+          fav[currentCard.order] = swap;
+          return { ...c, order: currentCard.order };
+        }
+        if (c.id === currentCard.id) {
+          return { ...c, order: card.order };
+        }
+        return c;
       }
-      if (c.id === currentCard.id) {
-        return { ...c, order: card.order };
-      }
-      return c;
     });
     setFavLocations(fav);
     setFavWeather(test);
@@ -285,13 +283,7 @@ const SearchPage = ({
     if (favLocations.length > 1) {
       setIsCheckboxAnimated(true);
     }
-
-    console.log(`loc`, favLocations);
   }, [favLocations]);
-
-  useEffect(() => {
-    console.log(`weather`, favWeather);
-  }, [favWeather]);
 
   return (
     <WeatherApp>
@@ -308,7 +300,6 @@ const SearchPage = ({
           <CardTitle>Manage Location</CardTitle>
         </CardHeader>
         <Search setCurrentLocation={setCurrentLocation} ref={inputRef} />
-
         <Transition in={isCheckboxAnimated} timeout={1000}>
           {(state: string) => (
             <CheckboxWrapper state={state}>
@@ -320,7 +311,6 @@ const SearchPage = ({
             </CheckboxWrapper>
           )}
         </Transition>
-
         <CardsContainer>
           {favLoading
             ? favLocations &&
@@ -333,8 +323,6 @@ const SearchPage = ({
                   key={card.id}
                   draggable={isDraggable}
                   onDragStart={(e) => isDraggable && dragStartHandler(e, card)}
-                  onDragLeave={(e) => isDraggable && dragEndHandler(e)}
-                  onDragEnd={(e) => isDraggable && dragEndHandler(e)}
                   onDragOver={(e) => isDraggable && dragOverHandler(e)}
                   onDrop={(e) => isDraggable && dropHandler(e, card)}
                   isDraggable={isDraggable}
@@ -342,6 +330,7 @@ const SearchPage = ({
                   <LocationCard
                     card={card}
                     coords={coords}
+                    currentLocation={currentLocation}
                     setCurrentLocation={setCurrentLocation}
                     favLocations={favLocations}
                     setFavLocations={setFavLocations}

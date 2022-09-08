@@ -14,7 +14,6 @@ const GlobalSlyle = createGlobalStyle`
     font-size: 12px;
     line-height: 14.5px;
     color: ${colors.lightColor};
-    /* background-color: ${bgColors.bgLightColor}; */
     background: grey;
     font-weight: 400;
   }

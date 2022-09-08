@@ -1,16 +1,23 @@
+/*Import React*/
 import styled, { css, keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Transition } from 'react-transition-group';
+import { useState, useEffect } from 'react';
 
-/*Import Variables*/
+/*Import Styles*/
 import { bgColors, colors } from '../styles/variables';
 
 /*Import Images*/
-
 import { ReactComponent as GeoMark } from '../assets/images/icon_geo.svg';
 import { ReactComponent as IconDots } from '../assets/images/icon_dots.svg';
 import { StyledFlex } from '../styles/StyledFlex';
-import { useState } from 'react';
+
+/*Import Types*/
+import {
+  FavCardProps,
+  CoordsProps,
+  CurrentLocationProps,
+} from '../types/types';
 
 const shake = keyframes`
     0% { transform: translateY(0) }
@@ -20,10 +27,12 @@ const shake = keyframes`
   100% { transform: translateY(0) }
 `;
 
-const CardWrapper = styled.div<{
+interface CardWrapperProps {
   state: undefined | string;
   isDraggable: boolean;
-}>`
+}
+
+const CardWrapper = styled.div<CardWrapperProps>`
   background: ${bgColors.bgLightColor};
   width: 100%;
   display: flex;
@@ -142,38 +151,35 @@ const DotsContainer = styled.div`
   height: fit-content;
 `;
 
+const Overlay = styled.div`
+  position: absolute;
+  display: flex;
+  top: -20px;
+  right: -20px;
+  background-color: ${colors.lightColor};
+  padding: 2px;
+  border: 1px solid ${colors.cardsLocationColor};
+  border-radius: 50px;
+  font-size: x-large;
+  cursor: pointer;
+`;
+
 interface LocationCardProps {
-  card: {
-    name: string;
-    main: {
-      temp_min: number;
-      temp_max: number;
-    };
-    coord: {
-      lon: number;
-      lat: number;
-    };
-    weather: {
-      description: string;
-      icon: string;
-    }[];
-    id: number;
-  };
-  coords: {
-    lon: string;
-    lat: string;
-  };
+  card: FavCardProps;
+  coords: CoordsProps;
+  currentLocation: CurrentLocationProps;
   setCurrentLocation: (currentLocation: any) => void;
-  favLocations: any;
-  setFavLocations: (favLocations: any) => void;
-  favWeather: any;
-  setFavWeather: (favWeather: any) => void;
+  favLocations: string[];
+  setFavLocations: (favLocations: string[]) => void;
+  favWeather: { id: number }[];
+  setFavWeather: (favWeather: { id: number }[]) => void;
   isDraggable: boolean;
 }
 
 const LocationCard = ({
   card,
   coords,
+  currentLocation,
   setCurrentLocation,
   favLocations,
   setFavLocations,
@@ -183,6 +189,7 @@ const LocationCard = ({
 }: LocationCardProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isCardAnimated, setIsCardAnimated] = useState<boolean>(false);
+
   return (
     <Transition in={isCardAnimated} timeout={1000}>
       {(state: string) => (
@@ -225,18 +232,22 @@ const LocationCard = ({
           </DotsContainer>
           {isOpen && !isDraggable && (
             <PopUp onClick={() => setIsOpen(!isOpen)}>
+              <Overlay>×</Overlay>
               <PopUpItems
                 onClick={() => {
                   setIsCardAnimated(true);
                   setTimeout(() => {
                     setFavWeather(
-                      favWeather.filter((p: any) => p.id !== card.id)
+                      favWeather.filter((p: { id: number }) => p.id !== card.id)
                     );
                     setFavLocations(
                       favLocations.filter(
-                        (p: any) => p !== favLocations[card.id]
+                        (p: string) => p !== favLocations[card.id]
                       )
                     );
+                    if (favLocations[card.id] === currentLocation?.value) {
+                      setCurrentLocation(null);
+                    }
                   }, 1000);
                 }}
               >

@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import styled from 'styled-components';
 
 interface StyledFlexProps {
@@ -17,21 +16,3 @@ const StyledFlex = styled.div<StyledFlexProps>`
 `;
 
 export { StyledFlex };
-
-// interface FlexProps {
-//   direction?: string;
-//   align?: string;
-//   justify?: string;
-//   margin?: string;
-//   children?: React.ReactNode;
-// }
-
-// const Flex: FC<FlexProps> = ({ direction, align, justify, children }) => {
-//   return (
-//     <StyledFlex direction={direction} align={align} justify={justify}>
-//       {children}
-//     </StyledFlex>
-//   );
-// };
-
-// export { Flex };

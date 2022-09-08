@@ -1,10 +1,17 @@
+/*Import React*/
 import styled, { ThemeProvider } from 'styled-components';
 import { Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
+/*Import Pages*/
 import { MainPage } from './pages/MainPage';
 import { SearchPage } from './pages/SearchPage';
 import { NotFoundPage } from './pages/NotFoundPage';
-import { useEffect, useState } from 'react';
+
+/*Import Helpers*/
 import { getTheme } from './helpers/getTheme';
+
+/*Import Styles*/
 import {
   afternoonTheme,
   bgColors,
@@ -13,6 +20,15 @@ import {
   morningTheme,
   nightTheme,
 } from './styles/variables';
+
+/*Import Types*/
+import {
+  CoordsProps,
+  DateProps,
+  CurrentLocationProps,
+  CardOtherProps,
+  ThemeProps,
+} from './types/types';
 
 const AppWrapper = styled.div`
   width: 100vw;
@@ -30,13 +46,14 @@ const WeatherApp = styled.div`
 `;
 
 const App = () => {
-  const [currentLocation, setCurrentLocation] = useState<string | any>();
+  const [currentLocation, setCurrentLocation] =
+    useState<CurrentLocationProps>();
   const [currentWeather, setCurrentWeather] = useState<any>();
-  const [otherWeather, setOtherWeather] = useState();
-  const [favLocations, setFavLocations] = useState<any[]>([]);
-  const [coords, setCoords] = useState<any>();
-  const [date, setDate] = useState<any>();
-  const [theme, setTheme] = useState<string | undefined>('idle');
+  const [otherWeather, setOtherWeather] = useState<CardOtherProps>();
+  const [favLocations, setFavLocations] = useState<string[]>([]);
+  const [coords, setCoords] = useState<CoordsProps>();
+  const [date, setDate] = useState<DateProps>();
+  const [theme, setTheme] = useState<ThemeProps>(idleTheme);
 
   /*Geolocation*/
   useEffect(() => {
@@ -50,40 +67,30 @@ const App = () => {
 
   /*Theme*/
   const switchTheme = () => {
-    if (getTheme(date?.hour) === 'morning') {
-      setTheme('morning');
-    }
-    if (getTheme(date?.hour) === 'afternoon') {
-      setTheme('afternoon');
-    }
-    if (getTheme(date?.hour) === 'evening') {
-      setTheme('evening');
-    }
-    if (getTheme(date?.hour) === 'night') {
-      setTheme('night');
+    switch (getTheme(date?.hour!)) {
+      case 'morning':
+        setTheme(morningTheme);
+        break;
+      case 'afternoon':
+        setTheme(afternoonTheme);
+        break;
+      case 'evening':
+        setTheme(eveningTheme);
+        break;
+      case 'night':
+        setTheme(nightTheme);
+        break;
+      default:
+        setTheme(idleTheme);
     }
   };
 
   useEffect(() => {
     switchTheme();
-  }, [date, currentLocation]);
+  }, [date, theme]);
 
   return (
-    <ThemeProvider
-      theme={
-        theme === 'idle'
-          ? idleTheme
-          : theme === 'morning'
-          ? morningTheme
-          : theme === 'afternoon'
-          ? afternoonTheme
-          : theme === 'evening'
-          ? eveningTheme
-          : theme === 'night'
-          ? nightTheme
-          : null
-      }
-    >
+    <ThemeProvider theme={theme}>
       <AppWrapper>
         <WeatherApp>
           <Routes>
@@ -91,14 +98,11 @@ const App = () => {
               path='/'
               element={
                 <SearchPage
-                  currentLocation={currentLocation}
+                  currentLocation={currentLocation!}
                   setCurrentLocation={setCurrentLocation}
-                  currentWeather={currentWeather}
-                  setOtherWeather={setOtherWeather}
-                  setCurrentWeather={setCurrentWeather}
                   favLocations={favLocations}
                   setFavLocations={setFavLocations}
-                  coords={coords}
+                  coords={coords!}
                 />
               }
             />
@@ -106,12 +110,12 @@ const App = () => {
               path='/card'
               element={
                 <MainPage
-                  currentLocation={currentLocation}
-                  date={date}
+                  currentLocation={currentLocation!}
+                  date={date!}
                   setDate={setDate}
                   currentWeather={currentWeather}
                   setCurrentWeather={setCurrentWeather}
-                  otherWeather={otherWeather}
+                  otherWeather={otherWeather!}
                   setOtherWeather={setOtherWeather}
                   favLocations={favLocations}
                   setFavLocations={setFavLocations}

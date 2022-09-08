@@ -1,12 +1,29 @@
+/*Import React*/
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
+
+/*Import Helpers*/
 import { getCurrentWeather, getDailyWeather } from '../api/getWeatherData';
+import { getDate } from '../helpers/getFormatedDate';
+
+/*Import Components*/
 import { HourlyCard } from '../components/HourlyCard';
 import { MainCard } from '../components/MainCard';
 import { DailyCard } from '../components/DailyCard';
+
+/*Import Styles*/
 import { bgColors } from '../styles/variables';
-import { getDate } from '../helpers/getFormatedDate';
+
+/*Import Styles*/
 import { SkeletonLoader } from '../styles/Loader';
+
+/*Import Types*/
+import {
+  CurrentLocationProps,
+  DateProps,
+  CardMainProps,
+  CardOtherProps,
+} from '../types/types';
 
 const WeatherApp = styled.div`
   display: flex;
@@ -38,18 +55,15 @@ const LoaderDaily = styled(SkeletonLoader)`
 `;
 
 interface MainPageProps {
-  currentLocation: {
-    value: string;
-    label: string;
-  };
-  date: any;
-  setDate: (date: any) => void;
-  currentWeather: any;
-  setCurrentWeather: (currentWeather: any) => void;
+  currentLocation: CurrentLocationProps;
+  date: DateProps;
+  setDate: (date: DateProps) => void;
+  currentWeather: CardMainProps;
+  setCurrentWeather: (currentWeather: CardMainProps) => void;
   otherWeather: any;
   setOtherWeather: (otherWeather: any) => void;
-  favLocations: any;
-  setFavLocations: (favLocations: any) => void;
+  favLocations: string[];
+  setFavLocations: (favLocations: string[]) => void;
 }
 
 const MainPage = ({
@@ -80,18 +94,19 @@ const MainPage = ({
   }, [currentLocation]);
 
   useEffect(() => {
-    console.log(`weather`, currentWeather);
-  }, [currentWeather]);
-
-  useEffect(() => {
-    console.log(otherWeather);
-  }, [otherWeather]);
-
-  useEffect(() => {
     if (currentWeather && currentWeather.timezone) {
       setDate(getDate(currentWeather.timezone));
     }
   }, [currentWeather]);
+
+  /*LOGS*/
+  // useEffect(() => {
+  //   console.log(`weather`, currentWeather);
+  // }, [currentWeather]);
+
+  // useEffect(() => {
+  //   console.log(`other`, otherWeather);
+  // }, [otherWeather]);
 
   return (
     <WeatherApp>

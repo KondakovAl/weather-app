@@ -1,9 +1,13 @@
+/*Import React*/
 import styled from 'styled-components';
 
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
 import { getFormatedHours } from '../helpers/getFormatedDate';
 import { useEffect, useState } from 'react';
+
+/*Import Types*/
+import { DateProps, CardHourlyProps, CardOtherProps } from '../types/types';
 
 const CardWrapper = styled.div`
   background: ${(props) => props.theme.background};
@@ -80,24 +84,18 @@ const CardTemp = styled.span``;
 const CardRain = styled.div``;
 
 interface HourlyCardProps {
-  dataHourly: any;
-  date: {
-    hour: number;
-    time: string;
-    weekday: string;
-    monthAndDay: string;
-  };
+  dataHourly: CardOtherProps;
+  date: DateProps;
 }
 
 const HourlyCard = ({ dataHourly, date }: HourlyCardProps) => {
-  const [hours, setHours] = useState<any>();
+  const [hours, setHours] = useState<string[]>([]);
 
   useEffect(() => {
-    setHours(
-      getFormatedHours(dataHourly?.list[0].dt, dataHourly?.city.timezone)
-    );
-    console.log(hours);
-  }, [hours]);
+    const arr: number[] = [];
+    dataHourly?.list.slice(0, 12).forEach((item: any) => arr.push(item.dt));
+    setHours(getFormatedHours(arr, dataHourly?.city.timezone));
+  }, [date]);
 
   return (
     <CardWrapper>
@@ -108,9 +106,9 @@ const HourlyCard = ({ dataHourly, date }: HourlyCardProps) => {
         </CardDateContainer>
         <CardInfoContainer>
           {dataHourly &&
-            dataHourly?.list.slice(0, 7).map((item: any, index: number) => (
+            dataHourly?.list.slice(0, 12).map((item: any, index: number) => (
               <CardMini key={index}>
-                <CardTime>{item?.dt_txt.substr(-8, 5)}</CardTime>
+                {hours && <CardTime>{hours[index]}</CardTime>}
                 <CardIconContainer>
                   <CardIcon
                     alt={item?.weather[0].description}

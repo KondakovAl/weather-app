@@ -1,23 +1,27 @@
+/*Import React*/
+import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { FormEvent, forwardRef, useEffect, useRef, useState } from 'react';
 
-/*Import Variables*/
+/*Import Styles*/
 import { bgColors, colors } from '../styles/variables';
+import { Loader } from '../styles/Loader';
 
 /*Import Images*/
 import { ReactComponent as IconSearch } from '../assets/images/icon_search.svg';
+import noLocation from '../assets/images/icon_nolocation.gif';
 
-/*Import Styles*/
-
-import { FormEvent, forwardRef, useEffect, useRef, useState } from 'react';
+/*Import Helpers*/
 import { getLocation } from '../api/getLocation';
+
+/*Import Hooks*/
 import { useDebounce } from '../hooks/useDebounce';
-import { Loader } from '../styles/Loader';
-import React from 'react';
+
+/*Import Types*/
+import { CurrentLocationProps } from '../types/types';
 
 const StyledLabel = styled.label`
-  /*Change to maxWidth!!*/
-
   position: relative;
   width: 100%;
   display: flex;
@@ -27,12 +31,11 @@ const StyledLabel = styled.label`
   padding: 0 16px;
   gap: 8px;
   margin-bottom: 20px;
-  z-index: 0;
-  transition: background-color 0.5s ease, border 0.5s ease;
+  z-index: 1;
+  transition: background-color 0.5s ease, box-shadow 0.5s ease;
   &:focus-within {
     background-color: #d8d8d8;
-    border: 1px solid black;
-    z-index: 1;
+    box-shadow: 0px 0px 0px 2px rgba(34, 60, 80, 1);
   }
 `;
 
@@ -56,6 +59,8 @@ const StyledIconWrapper = styled.div`
 
 interface AutoCompliteProps {
   search: boolean;
+  location: boolean;
+  loading: boolean | null;
 }
 
 const AutoComplite = styled.ul<AutoCompliteProps>`
@@ -65,7 +70,8 @@ const AutoComplite = styled.ul<AutoCompliteProps>`
   left: 0;
   top: 40px;
   background: ${bgColors.bgInput};
-  border: ${(p) => (p.search ? '1px solid black;' : 'none')};
+  border: ${({ search, location, loading }) =>
+    (search && location) || loading ? '1px solid black' : 'none'};
   z-index: -1;
   border-radius: 16px;
   overflow: hidden;
@@ -79,13 +85,18 @@ const AutoCompliteItem = styled.li`
   }
 `;
 
-const AutoCompliteMessage = styled.div`
-  padding: 15px;
+const AutoCompliteMessage = styled.li<{ background: string }>`
+  background: url(${(props) => props.background});
+  display: flex;
+  color: ${colors.lightColor};
+  font-weight: 600;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 `;
 
 interface SearchProps {
-  setCurrentLocation: (currentLocation: any) => void;
-  // ref?: React.MutableRefObject<HTMLInputElement> | any;
+  setCurrentLocation: (currentLocation: CurrentLocationProps) => void;
 }
 
 const Search = React.forwardRef(
@@ -94,8 +105,8 @@ const Search = React.forwardRef(
     ref: React.ForwardedRef<HTMLInputElement>
   ) => {
     const [search, setSearch] = useState<string | undefined | null>();
-    const [location, setLocation] = useState<any[]>([]);
-    const [loading, setLoading] = useState<boolean | undefined>();
+    const [location, setLocation] = useState<CurrentLocationProps[]>([]);
+    const [loading, setLoading] = useState<boolean | null>(null);
 
     const debouncedSearch = useDebounce(search, 600);
 
@@ -128,10 +139,16 @@ const Search = React.forwardRef(
           onChange={handleChange}
           ref={ref}
         />
-        <AutoComplite search={debouncedSearch}>
+        <AutoComplite
+          search={debouncedSearch}
+          location={location?.length !== 0}
+          loading={loading!}
+        >
           {loading && <Loader />}
-          {!loading && location?.length == 0 && debouncedSearch && (
-            <AutoCompliteMessage>No such location</AutoCompliteMessage>
+          {!loading && location?.length === 0 && debouncedSearch && (
+            <AutoCompliteMessage background={noLocation}>
+              No such location
+            </AutoCompliteMessage>
           )}
           {!loading &&
             debouncedSearch &&

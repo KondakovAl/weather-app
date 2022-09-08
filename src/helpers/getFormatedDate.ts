@@ -18,18 +18,23 @@ export const getDate = (timezone: number) => {
     return {hour, time, weekday, monthAndDay};
 };
 
-export const getFormatedHours = (unix: number, timezone: number) => {
-    const date = new Date(unix * 1000);
-
-    /*Date to UTC 0*/
-    const dateTimeStamp = date.getTime();
-    const offsetTimeStamp = date.getTimezoneOffset() * 60 * 1000;
-    const dateInUTC = dateTimeStamp + offsetTimeStamp;
-
-    const dateInLocation = dateInUTC + timezone * 1000;
-    const dateWithTimezone = new Date(dateInLocation);
-
-    const time = dateWithTimezone.toLocaleTimeString("en-US", {hour: "numeric", minute: "numeric", })
-
-    return time
+export const getFormatedHours = (unix: number[], timezone: number) => {
+    const timeArr: string[] = [];
+    unix.forEach((el)=> {
+        const date = new Date(el * 1000);
+       
+        /*Date to UTC 0*/
+        const dateTimeStamp = date.getTime();
+        const offsetTimeStamp = date.getTimezoneOffset() * 60 * 1000;
+        const dateInUTC = dateTimeStamp + offsetTimeStamp;
+    
+        const dateInLocation = dateInUTC + timezone * 1000;
+        const dateWithTimezone = new Date(dateInLocation);
+    
+        const time = dateWithTimezone.toLocaleTimeString("en-GB", {hour: "numeric", minute: "numeric", })
+        timeArr.push(time);
+    })
+    
+    return timeArr;
+   
 }

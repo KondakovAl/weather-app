@@ -1,12 +1,11 @@
+/*Import React*/
 import styled from 'styled-components';
-
-/*Import Variables*/
-import { bgColors } from '../styles/variables';
 
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
-import { useEffect } from 'react';
-import { Loader } from '../styles/Loader';
+
+/*Import Types*/
+import { CardDailyProps, CardOtherProps } from '../types/types';
 
 const CardWrapper = styled.div`
   background: ${(props) => props.theme.background};
@@ -78,16 +77,8 @@ const CardTemp = styled.span``;
 
 const CardText = styled.p``;
 
-const LoaderDaily = styled(Loader)`
-  width: 50px;
-  height: 50px;
-  border: 4px solid white;
-  border-left: 6px solid ${bgColors.bgMain};
-  margin: auto;
-`;
-
 interface DailyCardProps {
-  dataDaily: any;
+  dataDaily: CardDailyProps;
 }
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -97,13 +88,6 @@ const DailyCard = ({ dataDaily }: DailyCardProps) => {
   const forecastDays = WEEK_DAYS.slice(dayInAWeek - 1, WEEK_DAYS.length).concat(
     WEEK_DAYS.slice(0, dayInAWeek - 1)
   );
-
-  /*Each 8 item in array for next 5 days*/
-  useEffect(() => {
-    const filtredArr = dataDaily?.list.filter(
-      (elem: any) => dataDaily.list.indexOf(elem) % 8 == 0
-    );
-  }, [dataDaily]);
 
   return (
     <CardWrapper>

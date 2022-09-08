@@ -1,8 +1,11 @@
+/*Import React*/
 import styled, { keyframes } from 'styled-components';
+
+/*Import Styles*/
 import { bgColors, colors } from '../styles/variables';
 
+/*Import Images*/
 import { ReactComponent as CloudIcon } from '../assets/images/icon_pagenotfound_cloud.svg';
-
 import water from '../assets/images/water.png';
 
 const WeatherApp = styled.div`
@@ -30,19 +33,15 @@ const IconWrapper = styled.div`
 
 const IconWrapperFirst = styled(IconWrapper)`
   width: 400px;
-  top: -320px;
-  left: -150px;
+  top: -330px;
+  left: -95px;
 `;
 
 const IconWrapperSecond = styled(IconWrapper)`
   width: 350px;
   top: -350px;
-  left: 100px;
+  left: 160px;
 `;
-
-interface RainProps {
-  background: string;
-}
 
 const rainDrop = keyframes`
   0% {
@@ -54,7 +53,7 @@ const rainDrop = keyframes`
   }
 `;
 
-const Rain = styled.div<RainProps>`
+const Rain = styled.div<{ background: string }>`
   position: absolute;
   z-index: 2;
   height: 100%;

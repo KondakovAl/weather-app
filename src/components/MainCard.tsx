@@ -1,22 +1,19 @@
+/*Import React*/
 import styled from 'styled-components';
-
-/*Import Variables*/
-import { bgColors } from '../styles/variables';
+import { Link } from 'react-router-dom';
 
 /*Import Images*/
 import { ReactComponent as IconPlus } from '../assets/images/icon_plus.svg';
 import { ReactComponent as IconAdd } from '../assets/images/icon_add.svg';
 import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
-
 import { ReactComponent as IconDegree } from '../assets/images/icon_degree.svg';
 import { ReactComponent as IconParamWind } from '../assets/images/icon_param_wind.svg';
 import { ReactComponent as IconParamCloudness } from '../assets/images/icon_param_cloudness.svg';
 import { ReactComponent as IconParamPressure } from '../assets/images/icon_param_pressure.svg';
 import { ReactComponent as IconParamHumidity } from '../assets/images/icon_param_humidity.svg';
 
-/*Import Styles*/
-import { Link } from 'react-router-dom';
-import { Loader } from '../styles/Loader';
+/*Import Types*/
+import { DateProps, CurrentLocationProps, CardMainProps } from '../types/types';
 
 const CardWrapper = styled.div`
   width: calc(100% - 40px);
@@ -45,24 +42,6 @@ const CardTitle = styled.h1`
   font-weight: 600;
   font-size: 16px;
   line-height: 20px;
-  /* margin-bottom: 5px; */
-`;
-
-const PaginationList = styled.ul`
-  display: flex;
-  gap: 4px;
-`;
-
-interface PaginationListItemProps {
-  active?: boolean;
-}
-
-const PaginationListItem = styled.li<PaginationListItemProps>`
-  display: flex;
-  & svg {
-    fill: ${(p) => (p.active ? 'white' : '')};
-    transform: fill 0.3s ease-in;
-  }
 `;
 
 const StyledIconWrapper = styled.div`
@@ -155,8 +134,8 @@ const ParamsContainer = styled.div`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  place-items: start;
-  row-gap: 25px;
+  place-items: center;
+  gap: 25px 25px;
 `;
 
 const ParamsItem = styled.div`
@@ -164,7 +143,6 @@ const ParamsItem = styled.div`
   grid-template-columns: repeat(2, auto);
   grid-template-rows: repeat(2, 1fr);
   gap: 5px 10px;
-  padding: 0 15px;
 `;
 
 const ParamsItemIcon = styled.div`
@@ -198,27 +176,11 @@ const ParamsItemTextDescription = styled.span`
   grid-area: 2 / 2 / 3 / 3;
 `;
 
-const LoaderCurrent = styled(Loader)`
-  width: 50px;
-  height: 50px;
-  border: 4px solid white;
-  border-left: 6px solid ${bgColors.bgMain};
-  margin: auto;
-`;
-
 interface MainCardProps {
-  currentLocation: {
-    value: string;
-    label: string;
-  };
-  dataCurrent: any;
-  date: {
-    hour: number;
-    time: string;
-    weekday: string;
-    mounthAndDay: string;
-  };
-  favLocations: any;
+  currentLocation: CurrentLocationProps;
+  dataCurrent: CardMainProps;
+  date: DateProps;
+  favLocations: string[];
   setFavLocations: (favLocations: any) => void;
 }
 
@@ -229,13 +191,13 @@ const MainCard = ({
   favLocations,
   setFavLocations,
 }: MainCardProps) => {
-  /*Add or Remove cards from fovorites*/
+  /*Add or Remove cards from favorites*/
   const onHadleClick = () => {
     if (!favLocations.includes(currentLocation.value)) {
-      setFavLocations((arr: string[]) => [...arr, currentLocation.value]);
+      setFavLocations((arr: any) => [...arr, currentLocation.value]);
     } else {
       setFavLocations(
-        favLocations.filter((p: any) => p !== currentLocation.value)
+        favLocations.filter((p: string) => p !== currentLocation.value)
       );
     }
   };
