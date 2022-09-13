@@ -16,7 +16,7 @@ import { ReactComponent as IconParamHumidity } from '../assets/images/icon_param
 import { DateProps, CurrentLocationProps, CardMainProps } from '../types/types';
 
 const CardWrapper = styled.div`
-  width: calc(100% - 40px);
+  width: calc(100% - 25px);
   margin: 0 auto 16px;
 `;
 
