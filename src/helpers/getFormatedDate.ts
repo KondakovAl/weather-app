@@ -12,9 +12,9 @@ export const getDate = (timezone: number) => {
 
     const hour = parseInt(dateWithTimezone.toLocaleString("en-US", {hour: "2-digit", hour12: false})); 
     const time = dateWithTimezone.toLocaleTimeString("en-US", {hour: "numeric", minute: "numeric", })
-    const weekday = date.toLocaleString("en-US", {weekday: "short"}) 
-    const monthAndDay = date.toLocaleString("en-US", {month: 'short', day: 'numeric'})
-  
+    const weekday = dateWithTimezone.toLocaleString("en-US", {weekday: "short"}) 
+    const monthAndDay = dateWithTimezone.toLocaleString("en-US", {month: 'short', day: 'numeric'})
+    
     return {hour, time, weekday, monthAndDay};
 };
 

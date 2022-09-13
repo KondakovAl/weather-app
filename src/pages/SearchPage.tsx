@@ -50,7 +50,7 @@ const Container = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   @media (max-width: 450px) {
-    border-radius: 0px;
+    border-radius: 30px;
   }
 `;
 

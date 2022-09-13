@@ -1,5 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
-import { colors } from './variables';
+
+/*Import Styles*/
+import { colors,  gradients } from './variables';
 
 const GlobalSlyle = createGlobalStyle`
   * {
@@ -14,7 +16,7 @@ const GlobalSlyle = createGlobalStyle`
     font-size: 12px;
     line-height: 14.5px;
     color: ${colors.lightColor};
-    background: grey;
+    background: ${gradients.other};
     font-weight: 400;
   }
 
