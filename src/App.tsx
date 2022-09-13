@@ -14,7 +14,6 @@ import { getTheme } from './helpers/getTheme';
 /*Import Styles*/
 import {
   afternoonTheme,
-  bgColors,
   eveningTheme,
   gradients,
   idleTheme,
@@ -49,10 +48,14 @@ const AppWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: ${gradients.other}
   background-size: 400% 400%;
   animation: ${backgroundAnimation} 15s ease infinite;
+  @media (max-width: 450px) {
+    background: ${gradients.main}
+    background-size: cover;
+    animation: none;
+  }
 `;
 
 const WeatherApp = styled.div`
