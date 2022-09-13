@@ -60,7 +60,7 @@ const StyledIconWrapper = styled.div`
 interface AutoCompliteProps {
   search: boolean;
   location: boolean;
-  loading: boolean | null;
+  $loading: boolean;
 }
 
 const AutoComplite = styled.ul<AutoCompliteProps>`
@@ -70,8 +70,8 @@ const AutoComplite = styled.ul<AutoCompliteProps>`
   left: 0;
   top: 40px;
   background: ${bgColors.bgInput};
-  border: ${({ search, location, loading }) =>
-    (search && location) || loading ? '1px solid black' : 'none'};
+  border: ${({ search, location, $loading }) =>
+    (search && location) || $loading ? '1px solid black' : 'none'};
   z-index: -1;
   border-radius: 16px;
   overflow: hidden;
@@ -85,14 +85,23 @@ const AutoCompliteItem = styled.li`
   }
 `;
 
-const AutoCompliteMessage = styled.li<{ background: string }>`
+const AutoCompliteMessage = styled.li<{ background?: string }>`
   background: url(${(props) => props.background});
   display: flex;
   color: ${colors.lightColor};
   font-weight: 600;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 15px;
+`;
+
+const AutoCompliteError = styled.li`
+  display: flex;
+  color: ${colors.darkColor};
+  font-weight: 600;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
 `;
 
 interface SearchProps {
@@ -106,7 +115,7 @@ const Search = React.forwardRef(
   ) => {
     const [search, setSearch] = useState<string | undefined | null>();
     const [location, setLocation] = useState<CurrentLocationProps[]>([]);
-    const [loading, setLoading] = useState<boolean | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const debouncedSearch = useDebounce(search, 600);
 
@@ -142,13 +151,16 @@ const Search = React.forwardRef(
         <AutoComplite
           search={debouncedSearch}
           location={location?.length !== 0}
-          loading={loading!}
+          $loading={loading}
         >
           {loading && <Loader />}
           {!loading && location?.length === 0 && debouncedSearch && (
             <AutoCompliteMessage background={noLocation}>
               No such location
             </AutoCompliteMessage>
+          )}
+          {!loading && !location && debouncedSearch && (
+            <AutoCompliteError>Try again later</AutoCompliteError>
           )}
           {!loading &&
             debouncedSearch &&

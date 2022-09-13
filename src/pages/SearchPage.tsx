@@ -7,6 +7,7 @@ import { useRef, useEffect, useState } from 'react';
 /*Import Styles*/
 import { bgColors, gradients, colors } from '../styles/variables';
 import { SkeletonLoader } from '../styles/Loader';
+import { StyledFlex } from '../styles/StyledFlex';
 
 /*Import Images*/
 import { ReactComponent as IconArrow } from '../assets/images/icon_arrow.svg';
@@ -18,6 +19,9 @@ import { LocationCard } from '../components/LocationCard';
 import { Search } from '../components/Search';
 import { getCurrentWeather } from '../api/getWeatherData';
 
+/*Import hooks*/
+import { useWindowWidth } from '../hooks/useWindowWidth';
+
 /*Import Types*/
 import {
   CoordsProps,
@@ -28,6 +32,9 @@ import {
 const WeatherApp = styled.div`
   height: 100%;
   padding: 15px;
+  @media (max-width: 450px) {
+    padding: 0px;
+  }
   background-color: ${bgColors.bgLightColor};
 `;
 
@@ -42,6 +49,9 @@ const Container = styled.div`
   border-radius: 30px;
   overflow-y: auto;
   overflow-x: hidden;
+  @media (max-width: 450px) {
+    border-radius: 0px;
+  }
 `;
 
 const CardHeader = styled.header`
@@ -81,7 +91,6 @@ const CardIconContainer = styled.div`
   align-self: center;
   background-color: ${colors.lightColor};
   border-radius: 50%;
-  margin-top: 5px;
   padding: 5px;
   transition: all 1s ease;
   & svg {
@@ -119,8 +128,7 @@ const LoaderFav = styled(SkeletonLoader)<{ transitionDelay: number }>`
 
 const CheckboxWrapper = styled.div<{ state: string }>`
   position: absolute;
-  bottom: 2%;
-  right: 4%;
+  right: 5px;
   transform: translateX(
     ${({ state }) => {
       switch (state) {
@@ -197,6 +205,8 @@ const SearchPage = ({
   const [isCheckboxAnimated, setIsCheckboxAnimated] = useState<boolean>(false);
 
   const inputRef = useRef() as React.MutableRefObject<HTMLInputElement>;
+
+  const windowWidth = useWindowWidth();
 
   const focusHandler = () => {
     inputRef.current.focus();
@@ -277,12 +287,9 @@ const SearchPage = ({
   };
 
   useEffect(() => {
-    if (favLocations.length >= 0 && favLocations.length <= 1) {
-      setIsCheckboxAnimated(false);
-    }
-    if (favLocations.length > 1) {
-      setIsCheckboxAnimated(true);
-    }
+    favLocations.length > 1
+      ? setIsCheckboxAnimated(true)
+      : setIsCheckboxAnimated(false);
   }, [favLocations]);
 
   return (
@@ -300,17 +307,7 @@ const SearchPage = ({
           <CardTitle>Manage Location</CardTitle>
         </CardHeader>
         <Search setCurrentLocation={setCurrentLocation} ref={inputRef} />
-        <Transition in={isCheckboxAnimated} timeout={1000}>
-          {(state: string) => (
-            <CheckboxWrapper state={state}>
-              <CheckboxLabel onChange={() => setIsDraggable(!isDraggable)}>
-                <CheckboxInput />
-                <CheckboxMark isDraggable={isDraggable} />
-                draggable
-              </CheckboxLabel>
-            </CheckboxWrapper>
-          )}
-        </Transition>
+
         <CardsContainer>
           {favLoading
             ? favLocations &&
@@ -341,9 +338,29 @@ const SearchPage = ({
                 </LocationCardContainer>
               ))}
         </CardsContainer>
-        <CardIconContainer onClick={focusHandler}>
-          <IconPlus />
-        </CardIconContainer>
+        <StyledFlex
+          align='center'
+          style={{ position: 'relative' }}
+          margin='5px 0 0'
+          justify='center'
+        >
+          <CardIconContainer onClick={focusHandler}>
+            <IconPlus />
+          </CardIconContainer>
+          {windowWidth && windowWidth > 450 && (
+            <Transition in={isCheckboxAnimated} timeout={1000}>
+              {(state: string) => (
+                <CheckboxWrapper state={state}>
+                  <CheckboxLabel onChange={() => setIsDraggable(!isDraggable)}>
+                    <CheckboxInput />
+                    <CheckboxMark isDraggable={isDraggable} />
+                    draggable
+                  </CheckboxLabel>
+                </CheckboxWrapper>
+              )}
+            </Transition>
+          )}
+        </StyledFlex>
       </Container>
     </WeatherApp>
   );

@@ -24,6 +24,7 @@ import {
   CardMainProps,
   CardOtherProps,
 } from '../types/types';
+import { NotFoundPage } from './NotFoundPage';
 
 const WeatherApp = styled.div`
   display: flex;
@@ -107,6 +108,10 @@ const MainPage = ({
   // useEffect(() => {
   //   console.log(`other`, otherWeather);
   // }, [otherWeather]);
+
+  if (!currentLocation) {
+    return <NotFoundPage />;
+  }
 
   return (
     <WeatherApp>

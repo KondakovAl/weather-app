@@ -30,20 +30,24 @@ const shake = keyframes`
 interface CardWrapperProps {
   state: undefined | string;
   isDraggable: boolean;
+  isOpen: boolean;
 }
 
 const CardWrapper = styled.div<CardWrapperProps>`
   background: ${bgColors.bgLightColor};
-  width: 100%;
+  width: ${({ isOpen, isDraggable }) =>
+    isOpen && !isDraggable ? '70%' : '100%'};
+  height: ${({ isOpen, isDraggable }) =>
+    isOpen && !isDraggable ? '100px' : '80px'};
   display: flex;
   justify-content: space-between;
   padding: 16px;
   border-radius: 16px;
   line-height: 20px;
-  margin: 0 auto;
+  margin: 0;
   opacity: ${({ state }) =>
     state === 'exiting' || state === 'exited' ? '1' : '0'};
-  height: ${({ state }) =>
+  min-height: ${({ state }) =>
     state === 'exiting' || state === 'exited' ? '80px' : '0'};
   transform: scaleY(
     ${({ state }) => (state === 'exiting' || state === 'exited' ? '1' : '0')}
@@ -64,6 +68,15 @@ const CardContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 5px;
+`;
+
+const CardContainerLeft = styled(CardContainer)<{
+  isOpen: boolean;
+  isDraggable: boolean;
+}>`
+  max-width: ${({ isOpen, isDraggable }) =>
+    isOpen && !isDraggable ? '130px' : '250px'};
+  transition: all 1s ease;
 `;
 
 const CardContainerRight = styled(CardContainer)`
@@ -95,6 +108,7 @@ const CardTempContainer = styled.div`
 const CardTemp = styled.span``;
 
 const CardWeatherDescription = styled.div`
+  text-align: end;
   color: ${colors.cardsLocationColor};
 `;
 
@@ -102,7 +116,7 @@ const PopUp = styled.ul`
   position: absolute;
   top: 0;
   right: 0;
-  transform: translate(-10%, -120%);
+  transform: translate(120%, 10%);
   display: flex;
   flex-direction: column;
   font-size: 16px;
@@ -116,25 +130,25 @@ const PopUp = styled.ul`
   &:after {
     content: '';
     position: absolute;
-    bottom: -15px;
-    right: 10px;
+    top: 8px;
+    left: -15px;
     border: 10px solid transparent;
-    border-bottom: none;
-    border-top: 16px solid ${colors.lightColor};
+    border-left: none;
+    border-right: 16px solid ${colors.lightColor};
   }
   &:before {
     content: '';
     position: absolute;
-    bottom: -17px;
-    right: 10px;
+    top: 8px;
+    left: -17px;
     border: 10px solid transparent;
-    border-bottom: none;
-    border-top: 16px solid ${colors.cardsLocationColor};
+    border-left: none;
+    border-right: 16px solid ${colors.cardsLocationColor};
   }
 `;
 
 const PopUpItems = styled.li`
-  padding: 7px 10px;
+  padding: 7px 7px;
   cursor: pointer;
   transition: background-color 1s ease;
   &:first-child {
@@ -154,12 +168,11 @@ const DotsContainer = styled.div`
 const Overlay = styled.div`
   position: absolute;
   display: flex;
-  top: -20px;
+  top: -15px;
   right: -20px;
   background-color: ${colors.lightColor};
-  padding: 2px;
+  padding: 4px;
   border: 1px solid ${colors.cardsLocationColor};
-  border-radius: 50px;
   font-size: x-large;
   cursor: pointer;
 `;
@@ -193,12 +206,12 @@ const LocationCard = ({
   return (
     <Transition in={isCardAnimated} timeout={1000}>
       {(state: string) => (
-        <CardWrapper state={state} isDraggable={isDraggable}>
-          <CardContainer>
+        <CardWrapper state={state} isDraggable={isDraggable} isOpen={isOpen}>
+          <CardContainerLeft isOpen={isOpen} isDraggable={isDraggable}>
             <StyledFlex>
               <CardCity>{card?.name}</CardCity>
-              {card?.coord.lon.toFixed(1) === coords.lon &&
-                card?.coord.lat.toFixed(1) === coords.lat && (
+              {card?.coord.lon.toFixed(1) === coords?.lon &&
+                card?.coord.lat.toFixed(1) === coords?.lat && (
                   <CardIconContainer>
                     <GeoMark />
                   </CardIconContainer>
@@ -208,7 +221,7 @@ const LocationCard = ({
               <CardTemp>{card?.main?.temp_min.toFixed(1)}°</CardTemp>/
               <CardTemp>{card?.main?.temp_max.toFixed(1)}°</CardTemp>
             </CardTempContainer>
-          </CardContainer>
+          </CardContainerLeft>
           <CardContainerRight>
             <CardIconContainer>
               <CardIcon

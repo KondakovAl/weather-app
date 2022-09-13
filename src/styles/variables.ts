@@ -15,7 +15,12 @@ export const bgColors = {
 }
 
 export const gradients = {
-    main: 'linear-gradient(180deg, #62B8F6 0%, #2C79C1 77.96%);'
+    main: 'linear-gradient(180deg, #62B8F6 0%, #2C79C1 77.96%);',
+    other: `linear-gradient(
+        135deg,
+        hsla(165, 89%, 67%, 1) 0%,
+        hsla(245, 89%, 67%, 1) 100%
+      );`
 }
 
 export const morningTheme = {

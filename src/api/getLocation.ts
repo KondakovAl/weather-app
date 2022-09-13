@@ -30,14 +30,16 @@ const GEO_API_URL = 'https://wft-geo-db.p.rapidapi.com/v1/geo'
             }
           )
           if (!res.ok) {
-            console.error( `Couldn't fetch weather.`, res.status)
+            console.error( `Couldn't fetch weather.`, res.status);
             return false;
           }
           console.log(location);
           return location;
+          
   } catch (error) {
     if (error instanceof Error) {
-      console.error( `Couldn't fetch location.`, error.message)
+      console.error( `Couldn't fetch location.`, error.message);
+      
     }
   }
 

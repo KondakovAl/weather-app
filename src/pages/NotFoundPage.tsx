@@ -1,5 +1,6 @@
 /*Import React*/
 import styled, { keyframes } from 'styled-components';
+import { Link } from 'react-router-dom';
 
 /*Import Styles*/
 import { bgColors, colors } from '../styles/variables';
@@ -16,13 +17,6 @@ const WeatherApp = styled.div`
   width: 100%;
   height: 100%;
   background-color: ${bgColors.bgMain};
-`;
-
-const Text = styled.p`
-  color: ${colors.cardsLocationColorMain};
-  font-size: 32px;
-  font-weight: 700;
-  z-index: 5;
 `;
 
 const IconWrapper = styled.div`
@@ -63,6 +57,30 @@ const Rain = styled.div<{ background: string }>`
   animation: ${rainDrop} 0.3s linear infinite;
 `;
 
+const TextContainer = styled.div`
+  color: ${colors.cardsLocationColorMain};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+`;
+
+const Text = styled.p`
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 50px;
+`;
+
+const LinkText = styled.span`
+  font-size: 16px;
+  font-weight: 500;
+  border: 1px solid ${colors.darkColor};
+  border-radius: 10px;
+  padding: 10px 15px;
+  background: ${bgColors.bgLightColor};
+`;
+
 const NotFoundPage = () => {
   return (
     <WeatherApp>
@@ -73,7 +91,12 @@ const NotFoundPage = () => {
         <CloudIcon />
       </IconWrapperSecond>
       <Rain background={water} />
-      <Text>Page Not Found</Text>
+      <TextContainer>
+        <Text>No such location</Text>
+        <Link to='/'>
+          <LinkText>SEARCH</LinkText>
+        </Link>
+      </TextContainer>
     </WeatherApp>
   );
 };

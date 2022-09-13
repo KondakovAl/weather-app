@@ -1,5 +1,5 @@
 /*Import React*/
-import styled, { ThemeProvider } from 'styled-components';
+import styled, { keyframes, ThemeProvider } from 'styled-components';
 import { Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -16,6 +16,7 @@ import {
   afternoonTheme,
   bgColors,
   eveningTheme,
+  gradients,
   idleTheme,
   morningTheme,
   nightTheme,
@@ -30,13 +31,28 @@ import {
   ThemeProps,
 } from './types/types';
 
+const backgroundAnimation = keyframes`
+0% {
+  background-position: 0 50%;
+}
+50% {
+  background-position: 100% 50%;
+}
+100% {
+  background-position: 0 50%;
+}
+`;
+
 const AppWrapper = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${bgColors.bgGreyColor};
+
+  background: ${gradients.other}
+  background-size: 400% 400%;
+  animation: ${backgroundAnimation} 15s ease infinite;
 `;
 
 const WeatherApp = styled.div`
