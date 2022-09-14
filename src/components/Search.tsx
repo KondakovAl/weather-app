@@ -2,7 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { FormEvent, forwardRef, useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 /*Import Styles*/
 import { bgColors, colors } from '../styles/variables';
@@ -105,7 +105,9 @@ const AutoCompliteError = styled.li`
 `;
 
 interface SearchProps {
-  setCurrentLocation: (currentLocation: CurrentLocationProps) => void;
+  setCurrentLocation: React.Dispatch<
+    React.SetStateAction<CurrentLocationProps | null>
+  >;
 }
 
 const Search = React.forwardRef(
@@ -113,19 +115,16 @@ const Search = React.forwardRef(
     { setCurrentLocation }: SearchProps,
     ref: React.ForwardedRef<HTMLInputElement>
   ) => {
-    const [search, setSearch] = useState<string | undefined | null>();
+    const [search, setSearch] = useState<string>('');
     const [location, setLocation] = useState<CurrentLocationProps[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
     const debouncedSearch = useDebounce(search, 600);
 
-    const handleChange = (e: FormEvent<HTMLInputElement>) => {
+    const handleChange = (e: FormEvent<HTMLInputElement>) =>
       setSearch(e.currentTarget.value);
-    };
 
-    const handleClear = () => {
-      setSearch('');
-    };
+    const handleClear = () => setSearch('');
 
     useEffect(() => {
       if (debouncedSearch) {
@@ -149,7 +148,7 @@ const Search = React.forwardRef(
           ref={ref}
         />
         <AutoComplite
-          search={debouncedSearch}
+          search={!!debouncedSearch}
           location={location?.length !== 0}
           $loading={loading}
         >
@@ -165,7 +164,7 @@ const Search = React.forwardRef(
           {!loading &&
             debouncedSearch &&
             location &&
-            location.map((l: any, index: number) => (
+            location.map((l: CurrentLocationProps, index: number) => (
               <Link to='/card' key={index}>
                 <AutoCompliteItem
                   onClick={() => {

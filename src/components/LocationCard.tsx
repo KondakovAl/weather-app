@@ -2,7 +2,8 @@
 import styled, { css, keyframes } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Transition } from 'react-transition-group';
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 
 /*Import Styles*/
 import { bgColors, colors } from '../styles/variables';
@@ -181,11 +182,13 @@ interface LocationCardProps {
   card: FavCardProps;
   coords: CoordsProps;
   currentLocation: CurrentLocationProps;
-  setCurrentLocation: (currentLocation: any) => void;
+  setCurrentLocation: React.Dispatch<
+    React.SetStateAction<CurrentLocationProps | null>
+  >;
   favLocations: string[];
-  setFavLocations: (favLocations: string[]) => void;
-  favWeather: { id: number }[];
-  setFavWeather: (favWeather: { id: number }[]) => void;
+  setFavLocations: React.Dispatch<React.SetStateAction<string[]>>;
+  favWeather: FavCardProps[];
+  setFavWeather: React.Dispatch<React.SetStateAction<FavCardProps[]>>;
   isDraggable: boolean;
 }
 
@@ -272,6 +275,7 @@ const LocationCard = ({
                   onClick={() => {
                     setCurrentLocation({
                       value: favLocations[card.id],
+                      label: '',
                     });
                   }}
                 >
@@ -285,5 +289,4 @@ const LocationCard = ({
     </Transition>
   );
 };
-
 export { LocationCard };

@@ -181,7 +181,7 @@ interface MainCardProps {
   dataCurrent: CardMainProps;
   date: DateProps;
   favLocations: string[];
-  setFavLocations: (favLocations: any) => void;
+  setFavLocations: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const MainCard = ({
@@ -191,14 +191,14 @@ const MainCard = ({
   favLocations,
   setFavLocations,
 }: MainCardProps) => {
-  /*Add or Remove cards from favorites*/
   const onHadleClick = () => {
     if (!favLocations.includes(currentLocation.value)) {
-      setFavLocations((arr: any) => [...arr, currentLocation.value]);
+      setFavLocations([...favLocations, currentLocation.value]);
     } else {
-      setFavLocations(
-        favLocations.filter((p: string) => p !== currentLocation.value)
+      const filtredArr = favLocations.filter(
+        (current: string) => current !== currentLocation.value
       );
+      setFavLocations(filtredArr);
     }
   };
 
@@ -206,20 +206,14 @@ const MainCard = ({
     <CardWrapper>
       <CardContainer>
         <CardHeader>
-          <StyledIconWrapper
-            onClick={() => {
-              onHadleClick();
-            }}
-          >
+          <StyledIconWrapper onClick={onHadleClick}>
             {!favLocations.includes(currentLocation.value) ? (
               <IconPlus />
             ) : (
               <IconAdd />
             )}
           </StyledIconWrapper>
-
           <CardTitle>{dataCurrent?.name}</CardTitle>
-
           <Link to='/'>
             <StyledIconWrapperArrow>
               <IconArrow />

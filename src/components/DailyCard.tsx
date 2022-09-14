@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { StyledFlex } from '../styles/StyledFlex';
 
 /*Import Types*/
-import { CardDailyProps, CardOtherProps } from '../types/types';
+import { CardOtherProps, CardListProps } from '../types/types';
 
 const CardWrapper = styled.div`
   background: ${(props) => props.theme.background};
@@ -78,7 +78,7 @@ const CardTemp = styled.span``;
 const CardText = styled.p``;
 
 interface DailyCardProps {
-  dataDaily: CardDailyProps;
+  dataDaily: CardOtherProps;
 }
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -96,8 +96,10 @@ const DailyCard = ({ dataDaily }: DailyCardProps) => {
         <CardInfoContainer>
           {dataDaily &&
             dataDaily?.list
-              .filter((elem: any) => dataDaily.list.indexOf(elem) % 8 == 0)
-              .map((item: any, index: number) => (
+              ?.filter(
+                (elem: CardListProps) => dataDaily.list.indexOf(elem) % 8 === 0
+              )
+              ?.map((item: CardListProps, index: number) => (
                 <CardMini key={index}>
                   <CardDay>{forecastDays[index]}</CardDay>
                   <CardMiniContainer>

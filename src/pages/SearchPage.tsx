@@ -2,7 +2,7 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Transition } from 'react-transition-group';
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 /*Import Styles*/
 import { bgColors, gradients, colors } from '../styles/variables';
@@ -27,6 +27,7 @@ import {
   CoordsProps,
   DragCardProps,
   CurrentLocationProps,
+  FavCardProps,
 } from '../types/types';
 
 const WeatherApp = styled.div`
@@ -77,8 +78,8 @@ const CardsContainer = styled.div`
 `;
 
 interface StyledIconWrapperProps {
-  currentLocation: any;
-  favLocations: any;
+  currentLocation: boolean;
+  favLocations: boolean;
 }
 
 const StyledIconWrapper = styled.div<StyledIconWrapperProps>`
@@ -185,9 +186,11 @@ const CheckboxMark = styled.span<{ isDraggable: boolean }>`
 
 interface SearchPageProps {
   currentLocation: CurrentLocationProps;
-  setCurrentLocation: (currentLocation: CurrentLocationProps) => void;
+  setCurrentLocation: React.Dispatch<
+    React.SetStateAction<CurrentLocationProps | null>
+  >;
   favLocations: string[];
-  setFavLocations: (favLocations: string[]) => void;
+  setFavLocations: React.Dispatch<React.SetStateAction<string[]>>;
   coords: CoordsProps;
 }
 
@@ -198,7 +201,7 @@ const SearchPage = ({
   setFavLocations,
   coords,
 }: SearchPageProps) => {
-  const [favWeather, setFavWeather] = useState<any>([]);
+  const [favWeather, setFavWeather] = useState<any[]>([]);
   const [favLoading, setFavLoading] = useState<boolean>();
   const [currentCard, setCurrentCard] = useState<null | DragCardProps>(null);
   const [isDraggable, setIsDraggable] = useState<boolean>(false);
@@ -212,19 +215,15 @@ const SearchPage = ({
     inputRef.current.focus();
   };
 
-  const getFavArray = () => {
-    const favArray: any = [];
+  useEffect(() => {
+    const favArray: Promise<Response>[] = [];
     favLocations.forEach((item: string) => {
       const [lat, lon] = item?.split(' ');
       favArray.push(getCurrentWeather(lat, lon));
     });
-    return favArray;
-  };
-
-  useEffect(() => {
     setFavLoading(true);
     const favWeatherArray: any[] = [];
-    Promise.all(getFavArray()).then((res) => {
+    Promise.all(favArray).then((res) => {
       res.forEach((item, index) => {
         favWeatherArray.push({
           ...item,
@@ -237,31 +236,16 @@ const SearchPage = ({
     });
   }, [favLocations]);
 
-  const dragStartHandler = (
-    e: React.DragEvent<HTMLDivElement>,
-    card: DragCardProps
-  ) => {
-    setCurrentCard(card);
-    // const target = e.target as HTMLDivElement;
-    // target.style.opacity = `1`;
-  };
-
-  const dragOverHandler = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    // const target = e.target as HTMLDivElement;
-    // target.style.transform = `scale(0.5)`;
-  };
-
   const dropHandler = (
-    e: React.DragEvent<HTMLDivElement>,
-    card: DragCardProps
+    evt: React.DragEvent<HTMLDivElement>,
+    card: FavCardProps
   ) => {
-    e.preventDefault();
+    evt.preventDefault();
 
     let fav = [...favLocations];
     let swap = fav[card.id];
 
-    const test = favWeather?.map((c: DragCardProps) => {
+    const dragWeatherArray = favWeather?.map((c: FavCardProps) => {
       if (currentCard != null) {
         if (c.id === card.id) {
           fav[card.id] = fav[currentCard.order];
@@ -271,20 +255,15 @@ const SearchPage = ({
         if (c.id === currentCard.id) {
           return { ...c, order: card.order };
         }
-        return c;
       }
+      return c;
     });
+
     setFavLocations(fav);
-    setFavWeather(test);
+    setFavWeather(dragWeatherArray);
   };
 
-  const sortCards = (a: { order: number }, b: { order: number }) => {
-    if (a.order > b.order) {
-      return 1;
-    } else {
-      return -1;
-    }
-  };
+  const sortCards = (a: FavCardProps, b: FavCardProps) => a.order - b.order;
 
   useEffect(() => {
     favLocations.length > 1
@@ -298,7 +277,7 @@ const SearchPage = ({
         <CardHeader>
           <Link to='/card'>
             <StyledIconWrapper
-              currentLocation={currentLocation}
+              currentLocation={!!currentLocation}
               favLocations={favLocations.length !== 0}
             >
               <IconArrow />
@@ -311,17 +290,17 @@ const SearchPage = ({
         <CardsContainer>
           {favLoading
             ? favLocations &&
-              favLocations.map((item: any, index: number) => (
+              favLocations.map((item: string, index: number) => (
                 <LoaderFav key={index} transitionDelay={index * 0.3} />
               ))
             : favWeather &&
-              favWeather?.sort(sortCards).map((card: any, index: number) => (
+              favWeather?.sort(sortCards).map((card: FavCardProps) => (
                 <LocationCardContainer
                   key={card.id}
                   draggable={isDraggable}
-                  onDragStart={(e) => isDraggable && dragStartHandler(e, card)}
-                  onDragOver={(e) => isDraggable && dragOverHandler(e)}
-                  onDrop={(e) => isDraggable && dropHandler(e, card)}
+                  onDragStart={() => isDraggable && setCurrentCard(card)}
+                  onDragOver={(evt) => isDraggable && evt.preventDefault()}
+                  onDrop={(evt) => isDraggable && dropHandler(evt, card)}
                   isDraggable={isDraggable}
                 >
                   <LocationCard

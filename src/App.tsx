@@ -28,6 +28,7 @@ import {
   CurrentLocationProps,
   CardOtherProps,
   ThemeProps,
+  CardMainProps,
 } from './types/types';
 
 const backgroundAnimation = keyframes`
@@ -48,11 +49,11 @@ const AppWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${gradients.other}
+  background: ${gradients.other};
   background-size: 400% 400%;
   animation: ${backgroundAnimation} 15s ease infinite;
   @media (max-width: 450px) {
-    background: ${gradients.main}
+    background: ${gradients.main};
     background-size: cover;
     animation: none;
   }
@@ -66,12 +67,14 @@ const WeatherApp = styled.div`
 
 const App = () => {
   const [currentLocation, setCurrentLocation] =
-    useState<CurrentLocationProps>();
-  const [currentWeather, setCurrentWeather] = useState<any>();
-  const [otherWeather, setOtherWeather] = useState<CardOtherProps>();
+    useState<CurrentLocationProps | null>(null);
+  const [currentWeather, setCurrentWeather] = useState<CardMainProps | null>(
+    null
+  );
+  const [otherWeather, setOtherWeather] = useState<CardOtherProps | null>(null);
+  const [date, setDate] = useState<DateProps | null>(null);
   const [favLocations, setFavLocations] = useState<string[]>([]);
   const [coords, setCoords] = useState<CoordsProps>();
-  const [date, setDate] = useState<DateProps>();
   const [theme, setTheme] = useState<ThemeProps>(idleTheme);
 
   /*Geolocation*/
@@ -85,26 +88,26 @@ const App = () => {
   }, []);
 
   /*Theme*/
-  const switchTheme = () => {
-    switch (getTheme(date?.hour!)) {
-      case 'morning':
-        setTheme(morningTheme);
-        break;
-      case 'afternoon':
-        setTheme(afternoonTheme);
-        break;
-      case 'evening':
-        setTheme(eveningTheme);
-        break;
-      case 'night':
-        setTheme(nightTheme);
-        break;
-      default:
-        setTheme(idleTheme);
-    }
-  };
-
   useEffect(() => {
+    const switchTheme = () => {
+      let currentHour = getTheme(date?.hour!);
+      switch (currentHour) {
+        case 'morning':
+          setTheme(morningTheme);
+          break;
+        case 'afternoon':
+          setTheme(afternoonTheme);
+          break;
+        case 'evening':
+          setTheme(eveningTheme);
+          break;
+        case 'night':
+          setTheme(nightTheme);
+          break;
+        default:
+          setTheme(idleTheme);
+      }
+    };
     switchTheme();
   }, [date, theme]);
 
@@ -118,7 +121,7 @@ const App = () => {
               element={
                 <SearchPage
                   currentLocation={currentLocation!}
-                  setCurrentLocation={setCurrentLocation}
+                  setCurrentLocation={setCurrentLocation!}
                   favLocations={favLocations}
                   setFavLocations={setFavLocations}
                   coords={coords!}
@@ -132,7 +135,7 @@ const App = () => {
                   currentLocation={currentLocation!}
                   date={date!}
                   setDate={setDate}
-                  currentWeather={currentWeather}
+                  currentWeather={currentWeather!}
                   setCurrentWeather={setCurrentWeather}
                   otherWeather={otherWeather!}
                   setOtherWeather={setOtherWeather}

@@ -7,7 +7,7 @@ import { getFormatedHours } from '../helpers/getFormatedDate';
 import { useEffect, useState } from 'react';
 
 /*Import Types*/
-import { DateProps, CardHourlyProps, CardOtherProps } from '../types/types';
+import { DateProps, CardOtherProps, CardListProps } from '../types/types';
 
 const CardWrapper = styled.div`
   background: ${(props) => props.theme.background};
@@ -93,9 +93,11 @@ const HourlyCard = ({ dataHourly, date }: HourlyCardProps) => {
 
   useEffect(() => {
     const arr: number[] = [];
-    dataHourly?.list.slice(0, 12).forEach((item: any) => arr.push(item.dt));
-    setHours(getFormatedHours(arr, dataHourly?.city.timezone));
-  }, [date]);
+    dataHourly?.list
+      .slice(0, 12)
+      .forEach((item: CardListProps) => arr.push(item.dt));
+    setHours(getFormatedHours(arr, dataHourly?.city?.timezone));
+  }, [date, dataHourly?.list, dataHourly?.city?.timezone]);
 
   return (
     <CardWrapper>
@@ -106,21 +108,23 @@ const HourlyCard = ({ dataHourly, date }: HourlyCardProps) => {
         </CardDateContainer>
         <CardInfoContainer>
           {dataHourly &&
-            dataHourly?.list.slice(0, 12).map((item: any, index: number) => (
-              <CardMini key={index}>
-                {hours && <CardTime>{hours[index]}</CardTime>}
-                <CardIconContainer>
-                  <CardIcon
-                    alt={item?.weather[0].description}
-                    src={require(`../assets/images/weatherOtherIcons/${item?.weather[0].icon}.svg`)}
-                  />
-                </CardIconContainer>
-                <CardTempContainer>
-                  <CardTemp>{item?.main.temp.toFixed(1)}°</CardTemp>
-                </CardTempContainer>
-                <CardRain>{item?.weather[0].main}</CardRain>
-              </CardMini>
-            ))}
+            dataHourly?.list
+              ?.slice(0, 12)
+              ?.map((item: CardListProps, index: number) => (
+                <CardMini key={index}>
+                  {hours && <CardTime>{hours[index]}</CardTime>}
+                  <CardIconContainer>
+                    <CardIcon
+                      alt={item?.weather[0].description}
+                      src={require(`../assets/images/weatherOtherIcons/${item?.weather[0].icon}.svg`)}
+                    />
+                  </CardIconContainer>
+                  <CardTempContainer>
+                    <CardTemp>{item?.main.temp.toFixed(1)}°</CardTemp>
+                  </CardTempContainer>
+                  <CardRain>{item?.weather[0].main}</CardRain>
+                </CardMini>
+              ))}
         </CardInfoContainer>
       </StyledFlex>
     </CardWrapper>

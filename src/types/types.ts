@@ -40,6 +40,7 @@ export interface FavCardProps {
     icon: string;
   }[];
   id: number;
+  order: number;
   }
 
 export interface CardMainProps {
@@ -63,14 +64,14 @@ export interface CardMainProps {
   timezone?: number;
   }
 
-  /*Sum component*/
-
 export interface CardOtherProps  {
   city: {
     timezone: number;
   };
-  list: {
-    slice: Array<never>['slice'];
+  list: CardListProps[];
+}
+
+export interface CardListProps {
     dt: number;
     dt_txt: string;
      main: {
@@ -83,39 +84,4 @@ export interface CardOtherProps  {
       main: string;
       icon: string;
     }[];
- }
 }
-
-/*Sum_1 component*/
-export interface CardHourlyProps {
-  city: {
-    timezone: number;
-  };
-  list: {
-    slice: Array<never>['slice'];
-    dt: number;
-    dt_txt: string;
-    main: {
-      temp: number;
-    };
-    weather: {
-    description: string;
-    main: string;
-    icon: string;
-    }[];
-  }
-}
-  
-/*Sum_2 component*/
-  export interface CardDailyProps {
-    list: {
-      main: {
-        temp_min: number;
-        temp_max: number;
-      };
-      weather: {
-        description: string;
-        icon: string;
-      }[]; 
-     }[]; 
-  }

@@ -58,13 +58,13 @@ const LoaderDaily = styled(SkeletonLoader)`
 interface MainPageProps {
   currentLocation: CurrentLocationProps;
   date: DateProps;
-  setDate: (date: DateProps) => void;
+  setDate: React.Dispatch<React.SetStateAction<DateProps | null>>;
   currentWeather: CardMainProps;
-  setCurrentWeather: (currentWeather: CardMainProps) => void;
-  otherWeather: any;
-  setOtherWeather: (otherWeather: any) => void;
+  setCurrentWeather: React.Dispatch<React.SetStateAction<CardMainProps | null>>;
+  otherWeather: CardOtherProps;
+  setOtherWeather: React.Dispatch<React.SetStateAction<CardOtherProps | null>>;
   favLocations: string[];
-  setFavLocations: (favLocations: string[]) => void;
+  setFavLocations: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const MainPage = ({
@@ -92,22 +92,13 @@ const MainPage = ({
         setLoadingWeather(false);
       });
     }
-  }, [currentLocation]);
+  }, [currentLocation, setCurrentWeather, setOtherWeather]);
 
   useEffect(() => {
     if (currentWeather && currentWeather.timezone) {
       setDate(getDate(currentWeather.timezone));
     }
-  }, [currentWeather]);
-
-  /*LOGS*/
-  // useEffect(() => {
-  //   console.log(`weather`, currentWeather);
-  // }, [currentWeather]);
-
-  // useEffect(() => {
-  //   console.log(`other`, otherWeather);
-  // }, [otherWeather]);
+  }, [currentWeather, setDate]);
 
   if (!currentLocation) {
     return <NotFoundPage />;
