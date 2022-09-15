@@ -201,7 +201,7 @@ const SearchPage = ({
   setFavLocations,
   coords,
 }: SearchPageProps) => {
-  const [favWeather, setFavWeather] = useState<any[]>([]);
+  const [favWeather, setFavWeather] = useState<FavCardProps[]>([]);
   const [favLoading, setFavLoading] = useState<boolean>();
   const [currentCard, setCurrentCard] = useState<null | DragCardProps>(null);
   const [isDraggable, setIsDraggable] = useState<boolean>(false);
@@ -216,13 +216,13 @@ const SearchPage = ({
   };
 
   useEffect(() => {
-    const favArray: Promise<Response>[] = [];
+    const favArray: Promise<FavCardProps>[] = [];
     favLocations.forEach((item: string) => {
       const [lat, lon] = item?.split(' ');
       favArray.push(getCurrentWeather(lat, lon));
     });
     setFavLoading(true);
-    const favWeatherArray: any[] = [];
+    const favWeatherArray: FavCardProps[] = [];
     Promise.all(favArray).then((res) => {
       res.forEach((item, index) => {
         favWeatherArray.push({
@@ -231,6 +231,7 @@ const SearchPage = ({
           id: index,
         });
       });
+
       setFavWeather(favWeatherArray);
       setFavLoading(false);
     });
@@ -286,7 +287,6 @@ const SearchPage = ({
           <CardTitle>Manage Location</CardTitle>
         </CardHeader>
         <Search setCurrentLocation={setCurrentLocation} ref={inputRef} />
-
         <CardsContainer>
           {favLoading
             ? favLocations &&

@@ -2,7 +2,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState, memo } from 'react';
 
 /*Import Styles*/
 import { bgColors, colors } from '../styles/variables';
@@ -110,7 +110,7 @@ interface SearchProps {
   >;
 }
 
-const Search = React.forwardRef(
+const SearchInner = React.forwardRef(
   (
     { setCurrentLocation }: SearchProps,
     ref: React.ForwardedRef<HTMLInputElement>
@@ -182,4 +182,4 @@ const Search = React.forwardRef(
     );
   }
 );
-export { Search };
+export const Search = memo(SearchInner);

@@ -1,6 +1,6 @@
 /*Import React*/
 import styled from 'styled-components';
-
+import { memo } from 'react';
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
 
@@ -83,7 +83,7 @@ interface DailyCardProps {
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const DailyCard = ({ dataDaily }: DailyCardProps) => {
+const DailyCard = memo(({ dataDaily }: DailyCardProps) => {
   const dayInAWeek = new Date().getDay();
   const forecastDays = WEEK_DAYS.slice(dayInAWeek - 1, WEEK_DAYS.length).concat(
     WEEK_DAYS.slice(0, dayInAWeek - 1)
@@ -121,6 +121,6 @@ const DailyCard = ({ dataDaily }: DailyCardProps) => {
       </StyledFlex>
     </CardWrapper>
   );
-};
+});
 
 export { DailyCard };

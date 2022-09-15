@@ -4,7 +4,7 @@ import styled from 'styled-components';
 /*Import Styles*/
 import { StyledFlex } from '../styles/StyledFlex';
 import { getFormatedHours } from '../helpers/getFormatedDate';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 
 /*Import Types*/
 import { DateProps, CardOtherProps, CardListProps } from '../types/types';
@@ -88,7 +88,7 @@ interface HourlyCardProps {
   date: DateProps;
 }
 
-const HourlyCard = ({ dataHourly, date }: HourlyCardProps) => {
+const HourlyCard = memo(({ dataHourly, date }: HourlyCardProps) => {
   const [hours, setHours] = useState<string[]>([]);
 
   useEffect(() => {
@@ -129,6 +129,6 @@ const HourlyCard = ({ dataHourly, date }: HourlyCardProps) => {
       </StyledFlex>
     </CardWrapper>
   );
-};
+});
 
 export { HourlyCard };
